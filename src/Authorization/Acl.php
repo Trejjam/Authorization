@@ -61,14 +61,19 @@ class Acl extends Nette\Security\Permission
 	}
 
 	public function init() {
-		foreach ($this->getRoles_() as $v) {
-			$this->removeAllRoles();
-			$this->setupRoles($v);
-		}
+		try {
+			foreach ($this->getRoles_() as $v) {
+				$this->removeAllRoles();
+				$this->setupRoles($v);
+			}
 
-		foreach ($this->getResource_() as $v) {
-			$this->removeAllResources();
-			$this->setupResource($v);
+			foreach ($this->getResource_() as $v) {
+				$this->removeAllResources();
+				$this->setupResource($v);
+			}
+		}
+		catch (TableNotFound $e) {
+			trigger_error($e->getMessage(), E_USER_NOTICE);
 		}
 	}
 	private function reset() {
@@ -104,6 +109,9 @@ class Acl extends Nette\Security\Permission
 		return $this->_rootRoles;
 	}
 	private function createRolesTree() {
+		if (!$this->database->query("SHOW TABLES LIKE '" . $this->tables["roles"]["table"] . "'")->getRowCount()) {
+			throw new TableNotFound("Table " . $this->tables["roles"]["table"] . " not exist");
+		}
 		foreach ($this->database->table($this->tables["roles"]["table"]) as $v) {
 			$tableInfo = $this->tables["roles"];
 			unset($tableInfo["table"]);
@@ -144,6 +152,9 @@ class Acl extends Nette\Security\Permission
 		return $this->_resource;
 	}
 	private function createResourceTree() {
+		if (!$this->database->query("SHOW TABLES LIKE '" . $this->tables["resource"]["table"] . "'")->getRowCount()) {
+			throw new TableNotFound("Table " . $this->tables["resource"]["table"] . " not exist");
+		}
 		foreach ($this->database->table($this->tables["resource"]["table"]) as $v) {
 			$tableInfo = $this->tables["resource"];
 			unset($tableInfo["table"]);
@@ -586,4 +597,9 @@ class AclResource
 	public function getRole() {
 		return $this->role;
 	}
+}
+
+class TableNotFound extends \Exception
+{
+
 }

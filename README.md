@@ -88,11 +88,20 @@ After successful installation display:
 ```
 Available commands:
 Auth
+	Auth:install    Install default tables
 	Auth:resource   Edit resource
 	Auth:role       Edit role
 	Auth:user       Edit user
 	help            Displays help for a command
 	list            Lists commands
+```
+
+Config database
+---------------
+
+Create default tables:
+```sh
+php index.php Auth:install
 ```
 
 Config role
