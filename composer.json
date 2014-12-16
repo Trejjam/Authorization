@@ -22,6 +22,9 @@
   "require-dev": {
 	"nette/tester": "@dev"
   },
+  "suggest": {
+    "kdyby/console": "to use CLI configurator"
+  },
   "autoload": {
 	"classmap": ["src/Authorization"]
   }
