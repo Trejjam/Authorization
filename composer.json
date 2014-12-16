@@ -1,0 +1,28 @@
+{
+  "name": "trejjam/authorization",
+  "description": "Authorization, Authentication, Acl",
+  "keywords": [
+	"nette",
+	"authorization",
+    "authentication",
+    "acl"
+  ],
+  "license": [
+	"MIT"
+  ],
+  "authors": [
+	{
+	  "name": "Jan Trejbal"
+	}
+  ],
+  "require": {
+	"php": ">=5.3.1",
+	"nette/nette": "~2.2"
+  },
+  "require-dev": {
+	"nette/tester": "@dev"
+  },
+  "autoload": {
+	"classmap": ["src/Authorization"]
+  }
+}
