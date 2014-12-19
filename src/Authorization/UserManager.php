@@ -179,7 +179,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		$out=[];
 
 		$usersTable= $this->tables["users"];
-		$cels=[
+		$cells=[
 			$usersTable["id"],
 			$usersTable["status"]["name"],
 			$usersTable["activated"]["name"],
@@ -190,7 +190,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 
 		foreach ($this->database->table($this->tables["users"]["table"]) as $k=>$v) {
 			$out[$k]=[];
-			foreach ($cels as $v2) {
+			foreach ($cells as $v2) {
 				$out[$k][$v2]=$v->{$v2};
 			}
 		}
