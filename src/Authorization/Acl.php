@@ -67,13 +67,13 @@ class Acl extends Nette\Security\Permission
 				$this->setupRoles($v);
 			}
 
+			$this->removeAllResources();
 			foreach ($this->getResource_() as $v) {
-				$this->removeAllResources();
 				$this->setupResource($v);
 			}
 		}
 		catch (TableNotFound $e) {
-			trigger_error($e->getMessage(), E_USER_NOTICE);
+			dump($e->getMessage());
 		}
 	}
 	private function reset() {
