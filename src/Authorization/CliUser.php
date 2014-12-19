@@ -97,7 +97,7 @@ class CliUser extends CliHelper
 				$this->userManager->setStatus($username, $status);
 
 				$userId = $this->userManager->getUserId($username);
-				$this->userManager->setUpdated($userId);
+				$this->userManager->setUpdated($userId, "id");
 			}
 			catch (\Exception $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
@@ -108,7 +108,7 @@ class CliUser extends CliHelper
 				$this->userManager->setActivated($username, $activated);
 
 				$userId = $this->userManager->getUserId($username);
-				$this->userManager->setUpdated($userId);
+				$this->userManager->setUpdated($userId, "id");
 			}
 			catch (\Exception $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
@@ -132,7 +132,7 @@ class CliUser extends CliHelper
 					$this->acl->addUserRole($userId, $v);
 				}
 
-				$this->userManager->setUpdated($userId);
+				$this->userManager->setUpdated($userId, "id");
 			}
 			catch (\Exception $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
@@ -145,7 +145,7 @@ class CliUser extends CliHelper
 					$this->acl->removeUserRole($userId, $v);
 				}
 
-				$this->userManager->setUpdated($userId);
+				$this->userManager->setUpdated($userId, "id");
 			}
 			catch (\Exception $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");

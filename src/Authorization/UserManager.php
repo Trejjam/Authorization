@@ -112,7 +112,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		}
 	}
 	protected function getUser($username, $type = "username") {
-		switch ($username) {
+		switch ($type) {
 			case "username":
 				$this->isUsernameValid($username);
 
@@ -135,8 +135,8 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		}
 	}
 
-	public function setUpdated($id) {
-		$user = $this->database->table($this->tables["users"]["table"])->get($id);
+	public function setUpdated($username, $type = "username") {
+		$user = $this->getUser($username, $type);
 
 		if ($user) {
 			$user->update([
@@ -144,7 +144,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			]);
 		}
 		else {
-			throw new \Exception("The user with ID $id not exist");
+			throw new \Exception("The user $username:$type not exist");
 		}
 	}
 	public function add($username, $password) {
@@ -156,28 +156,28 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
 	}
-	public function changePassword($username, $password) {
-		$user = $this->getUser($username);
+	public function changePassword($username, $password, $type = "username") {
+		$user = $this->getUser($username, $type);
 
 		$user->update([
 			$this->tables["users"]["password"]            => Passwords::hash($password),
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
 	}
-	public function setStatus($username, $status) {
-		$user = $this->getUser($username);
+	public function setStatus($username, $status, $type = "username") {
+		$user = $this->getUser($username, $type);
 
 		$user->update([
 			$this->tables["users"]["status"]["name"]      => $status,
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
 	}
-	public function setActivated($username, $activated = NULL) {
+	public function setActivated($username, $activated = NULL, $type = "username") {
 		if (is_null($activated)) {
 			$activated = $this->tables["users"]["activated"]["yes"];
 		}
 
-		$user = $this->getUser($username);
+		$user = $this->getUser($username, $type);
 
 		$user->update([
 			$this->tables["users"]["activated"]["name"]   => $activated,
