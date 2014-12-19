@@ -115,7 +115,7 @@ class Acl extends Nette\Security\Permission
 		foreach ($this->database->table($this->tables["roles"]["table"]) as $v) {
 			$tableInfo = $this->tables["roles"];
 			unset($tableInfo["table"]);
-			if ($tableInfo["info"]) {
+			if ($tableInfo["info"] === FALSE) {
 				unset($tableInfo["info"]);
 			}
 
@@ -517,7 +517,7 @@ class AclRole
 	 * @throws \Exception
 	 */
 	public function getInfo() {
-		if (!$this->info) throw new \Exception("This field was disabled in configuration");
+		if ($this->info === FALSE) throw new \Exception("This field was disabled in configuration");
 
 		return $this->info;
 	}
