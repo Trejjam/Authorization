@@ -111,11 +111,21 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			throw new \Exception("The user is not exist");
 		}
 	}
-	protected function getUser($username) {
-		$this->isUsernameValid($username);
+	protected function getUser($username, $type = "username") {
+		switch ($username) {
+			case "username":
+				$this->isUsernameValid($username);
 
-		$user = $this->database->table($this->tables["users"]["table"])
-							   ->where([$this->tables["users"]["username"]["name"] => $username])->fetch();
+				$user = $this->database->table($this->tables["users"]["table"])
+									   ->where([$this->tables["users"]["username"]["name"] => $username])->fetch();
+				break;
+			case "id":
+				$user = $this->database->table($this->tables["users"]["table"])
+									   ->where([$this->tables["users"]["id"] => $username])->fetch();
+				break;
+			default:
+				throw new \Exception("Unrecognized type");
+		}
 
 		if ($user) {
 			return $user;
@@ -184,12 +194,31 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 
 		return $out;
 	}
-	public function getUserInfo($username) {
-		if ($username instanceof Nette\Database\Table\ActiveRow) {
-
+	public function getUserInfo($username, $type = "auto") {
+		if ($type == "auto") {
+			if ($username instanceof Nette\Database\Table\ActiveRow) {
+				$type = "activeRow";
+			}
+			else {
+				$type = "username";
+			}
 		}
-		else {
-			$user = $this->getUser($username);
+
+		switch ($type) {
+			case "activeRow":
+				$user = $username;
+
+				break;
+			case "username":
+				$user = $this->getUser($username);
+
+				break;
+			case "id":
+				$user = $this->getUser($username, $type);
+
+				break;
+			default:
+				throw new \Exception("Unrecognized type");
 		}
 
 		$usersTable = $this->tables["users"];
