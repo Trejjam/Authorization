@@ -541,6 +541,21 @@ class AclRole
 	public function getResource() {
 		return $this->resources;
 	}
+
+	/**
+	 * @return int
+	 */
+	public function getDepth() {
+		$depth=0;
+
+		$tempThis=$this;
+		while($tempThis->hasParent()) {
+			$tempThis= $tempThis->getParent();
+			$depth++;
+		}
+
+		return $depth;
+	}
 }
 
 class AclResource
