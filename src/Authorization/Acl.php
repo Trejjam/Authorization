@@ -136,7 +136,7 @@ class Acl extends Nette\Security\Permission
 	}
 
 	private function setupResource(AclResource $resource) {
-		if ($resource->getName() === $resource->getNameRaw()) {
+		if ($resource->getName() === $resource->getNameRaw() && !$this->hasResource($resource->getName())) {
 			$this->addResource($resource->getName());
 		}
 		$this->allow($resource->getRole()->getName(), $resource->getName(), $resource->getAction());
