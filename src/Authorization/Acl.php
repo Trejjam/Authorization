@@ -20,33 +20,33 @@ class Acl extends Nette\Security\Permission
 	const
 		DEFAULT_RESOURCE_ACTION = "ALL";
 
-	private $cacheParams = [];
+	protected $cacheParams = [];
 
 	/**
 	 * @var Caching\Cache
 	 */
-	private $cache;
+	protected $cache;
 	/**
 	 * @var Nette\Database\Context
 	 */
-	private $database;
+	protected $database;
 
-	private $tables;
-	private $reloadChangedUser;
+	protected $tables;
+	protected $reloadChangedUser;
 
 	/**
 	 * @var AclRole[]
 	 */
-	private $_roles = [];
+	protected $_roles = [];
 	/**
 	 * @var AclRole[]
 	 */
-	private $_rootRoles = [];
+	protected $_rootRoles = [];
 
 	/**
 	 * @var AclResource[]
 	 */
-	private $_resource = [];
+	protected $_resource = [];
 
 	public function __construct(Caching\Cache $cache = NULL, Nette\Database\Context $database) {
 		$this->cache = $cache;
@@ -76,7 +76,7 @@ class Acl extends Nette\Security\Permission
 			dump($e->getMessage());
 		}
 	}
-	private function reset() {
+	protected function reset() {
 		$this->clearCache();
 		$this->_roles = [];
 		$this->_rootRoles = [];
@@ -85,7 +85,7 @@ class Acl extends Nette\Security\Permission
 		$this->init();
 	}
 
-	private function setupRoles(AclRole $role) {
+	protected function setupRoles(AclRole $role) {
 		$this->addRole($role->getName(), $role->hasParent() ? $role->getParent()->getName() : NULL);
 
 		foreach ($role->getChild() as $v) {
@@ -108,7 +108,7 @@ class Acl extends Nette\Security\Permission
 
 		return $this->_rootRoles;
 	}
-	private function createRolesTree() {
+	protected function createRolesTree() {
 		if (!$this->database->query("SHOW TABLES LIKE '" . $this->tables["roles"]["table"] . "'")->getRowCount()) {
 			throw new TableNotFound("Table " . $this->tables["roles"]["table"] . " not exist");
 		}
@@ -135,7 +135,7 @@ class Acl extends Nette\Security\Permission
 		$this->cacheSave(self::CACHE_ROLE . self::CACHE_LIST, serialize($this->_rootRoles));
 	}
 
-	private function setupResource(AclResource $resource) {
+	protected function setupResource(AclResource $resource) {
 		if ($resource->getName() === $resource->getNameRaw() && !$this->hasResource($resource->getName())) {
 			$this->addResource($resource->getName());
 		}
@@ -151,7 +151,7 @@ class Acl extends Nette\Security\Permission
 
 		return $this->_resource;
 	}
-	private function createResourceTree() {
+	protected function createResourceTree() {
 		if (!$this->database->query("SHOW TABLES LIKE '" . $this->tables["resource"]["table"] . "'")->getRowCount()) {
 			throw new TableNotFound("Table " . $this->tables["resource"]["table"] . " not exist");
 		}
@@ -173,7 +173,7 @@ class Acl extends Nette\Security\Permission
 	 * @param $role
 	 * @return null|AclRole
 	 */
-	private function getRoleByName($role) {
+	public function getRoleByName($role) {
 		$this->getRoles_();
 
 		foreach ($this->_roles as $v) {
@@ -313,7 +313,7 @@ class Acl extends Nette\Security\Permission
 
 		$this->reset();
 	}
-	private function findCircle(AclRole $role, AclRole $parent) {
+	protected function findCircle(AclRole $role, AclRole $parent) {
 		if ($role->getId() == $parent->getId()) {
 			return TRUE;
 		}
@@ -386,7 +386,7 @@ class Acl extends Nette\Security\Permission
 			throw new \Exception("Resource not exist");
 		}
 	}
-	private function getResource($resource, $resourceAction = NULL) {
+	protected function getResource($resource, $resourceAction = NULL) {
 		$dbArr = [
 			$this->tables["resource"]["resourceName"]   => $resource,
 			$this->tables["resource"]["resourceAction"] => is_null($resourceAction) ? self::DEFAULT_RESOURCE_ACTION : $resourceAction,
@@ -403,17 +403,17 @@ class Acl extends Nette\Security\Permission
 	}
 
 
-	private function clearCache() {
+	protected function clearCache() {
 		if (is_null($this->cache)) return;
 
 		$this->cache->clean();
 	}
-	private function cacheSave($key, $value) {
+	protected function cacheSave($key, $value) {
 		if (is_null($this->cache)) return;
 
 		$this->cache->save($key, $value, $this->cacheParams);
 	}
-	private function cacheLoad($key) {
+	protected function cacheLoad($key) {
 		if (is_null($this->cache)) return NULL;
 
 		if (!is_null($this->cache->load($key))) {
@@ -427,24 +427,24 @@ class Acl extends Nette\Security\Permission
 
 class AclRole
 {
-	private $id;
-	private $parentId;
-	private $roleName;
-	private $info = FALSE;
+	protected $id;
+	protected $parentId;
+	protected $roleName;
+	protected $info = FALSE;
 
 	/**
 	 * @var AclRole
 	 */
-	private $parent = NULL;
+	protected $parent = NULL;
 	/**
 	 * @var AclRole[]
 	 */
-	private $child = [];
+	protected $child = [];
 
 	/**
 	 * @var AclResource[]
 	 */
-	private $resources = [];
+	protected $resources = [];
 
 	function __construct(Nette\Database\Table\IRow $row, array $tableInfo) {
 		foreach ($tableInfo as $k => $v) {
@@ -560,15 +560,15 @@ class AclRole
 
 class AclResource
 {
-	private $id;
-	private $roleId;
-	private $resourceName;
-	private $resourceAction;
+	protected $id;
+	protected $roleId;
+	protected $resourceName;
+	protected $resourceAction;
 
 	/**
 	 * @var AclRole
 	 */
-	private $role = NULL;
+	protected $role = NULL;
 
 	function __construct(Nette\Database\Table\IRow $row, array $tableInfo) {
 		foreach ($tableInfo as $k => $v) {
