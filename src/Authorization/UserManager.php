@@ -176,23 +176,35 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	}
 
 	public function getUsersList() {
-		$out=[];
+		$out = [];
 
-		$usersTable= $this->tables["users"];
-		$cells=[
+		foreach ($this->database->table($this->tables["users"]["table"]) as $k => $v) {
+			$out[$k] = $this->getUserInfo($v);
+		}
+
+		return $out;
+	}
+	public function getUserInfo($username) {
+		if ($username instanceof Nette\Database\Table\ActiveRow) {
+
+		}
+		else {
+			$user = $this->getUser($username);
+		}
+
+		$usersTable = $this->tables["users"];
+		$cells = [
 			$usersTable["id"],
 			$usersTable["status"]["name"],
 			$usersTable["activated"]["name"],
-			$usersTable["username"],
+			$usersTable["username"]["name"],
 			$usersTable["timestamp"]["created"],
 			$usersTable["timestamp"]["edited"],
 		];
 
-		foreach ($this->database->table($this->tables["users"]["table"]) as $k=>$v) {
-			$out[$k]=[];
-			foreach ($cells as $v2) {
-				$out[$k][$v2]=$v->{$v2};
-			}
+		$out = new \stdClass;
+		foreach ($cells as $v) {
+			$out->{$v} = $user->{$v};
 		}
 
 		return $out;
