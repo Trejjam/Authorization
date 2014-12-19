@@ -174,4 +174,27 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
 	}
+
+	public function getUsersList() {
+		$out=[];
+
+		$usersTable= $this->tables["users"];
+		$cels=[
+			$usersTable["id"],
+			$usersTable["status"]["name"],
+			$usersTable["activated"]["name"],
+			$usersTable["username"],
+			$usersTable["timestamp"]["created"],
+			$usersTable["timestamp"]["edited"],
+		];
+
+		foreach ($this->database->table($this->tables["users"]["table"]) as $k=>$v) {
+			$out[$k]=[];
+			foreach ($cels as $v2) {
+				$out[$k][$v2]=$v->{$v2};
+			}
+		}
+
+		return $out;
+	}
 }
