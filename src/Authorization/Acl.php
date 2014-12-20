@@ -62,8 +62,8 @@ class Acl extends Nette\Security\Permission
 
 	public function init() {
 		try {
+			$this->removeAllRoles();
 			foreach ($this->getRoles_() as $v) {
-				$this->removeAllRoles();
 				$this->setupRoles($v);
 			}
 
@@ -86,10 +86,16 @@ class Acl extends Nette\Security\Permission
 	}
 
 	protected function setupRoles(AclRole $role) {
-		$this->addRole($role->getName(), $role->hasParent() ? $role->getParent()->getName() : NULL);
-
-		foreach ($role->getChild() as $v) {
-			$this->setupRoles($v);
+		if ($role->hasChild()) {
+			$parents=[];
+			foreach ($role->getChild() as $v) {
+				$this->setupRoles($v);
+				$parents[]=$v->getName();
+			}
+			$this->addRole($role->getName(), $parents);
+		}
+		else {
+			$this->addRole($role->getName());
 		}
 	}
 	public function getRoles_() {
