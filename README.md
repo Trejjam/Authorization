@@ -159,6 +159,11 @@ Add user:
 php index.php Auth:user -c username password
 ```
 
+Change password:
+```sh
+php index.php Auth:user -p username password
+```
+
 Set user status:
 ```sh
 php index.php Auth:user -s status username

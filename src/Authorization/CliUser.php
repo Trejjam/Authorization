@@ -34,6 +34,12 @@ class CliUser extends CliHelper
 				'Create new user',
 				NULL
 			)->addOption(
+				'change-password',
+				'p',
+				InputOption::VALUE_NONE,
+				'Change password',
+				NULL
+			)->addOption(
 				'status',
 				's',
 				InputOption::VALUE_REQUIRED,
@@ -66,11 +72,12 @@ class CliUser extends CliHelper
 	}
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$create = $input->getOption('create');
+		$changePassword = $input->getOption('change-password');
 		$status = $input->getOption('status');
 		$activated = $input->getOption('activated');
-		$roles = $input->getOption('roles');
 		$role_add = $input->getOption('role_add');
 		$role_remove = $input->getOption('role_remove');
+		$roles = $input->getOption('roles');
 
 		$username = $input->getArgument('username');
 		$password = $input->getArgument('password');
@@ -83,7 +90,7 @@ class CliUser extends CliHelper
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
-		else if (!$create && !is_null($password)) {
+		if ($changePassword && !is_null($password)) {
 			try {
 				$this->userManager->changePassword($username, $password);
 			}
@@ -114,17 +121,7 @@ class CliUser extends CliHelper
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
-		if ($roles) {
-			try {
-				$roles = $this->acl->getUserRoles($this->userManager->getUserId($username));
 
-				$output->writeln("User roles:");
-				$output->writeln($roles);
-			}
-			catch (\Exception $e) {
-				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
-			}
-		}
 		if (!is_null($role_add)) {
 			try {
 				$userId = $this->userManager->getUserId($username);
@@ -146,6 +143,18 @@ class CliUser extends CliHelper
 				}
 
 				$this->userManager->setUpdated($userId, "id");
+			}
+			catch (\Exception $e) {
+				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
+			}
+		}
+
+		if ($roles) {
+			try {
+				$roles = $this->acl->getUserRoles($this->userManager->getUserId($username));
+
+				$output->writeln("User roles:");
+				$output->writeln($roles);
 			}
 			catch (\Exception $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
