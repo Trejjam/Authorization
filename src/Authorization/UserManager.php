@@ -181,18 +181,26 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		}
 	}
 	/**
-	 * @param string $username
-	 * @param string $password
+	 * @param $username
+	 * @param $password
+	 * @return bool
 	 * @throws \Exception
 	 */
 	public function add($username, $password) {
 		$this->isUsernameValid($username);
+
+		try {
+			$this->getUser($username);
+			return false;
+		}
+		catch(\Exception $e) {}
 
 		$this->database->table($this->tables["users"]["table"])->insert([
 			$this->tables["users"]["username"]["name"]    => $username,
 			$this->tables["users"]["password"]            => Passwords::hash($password),
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
+		return true;
 	}
 	/**
 	 * @param string $username
