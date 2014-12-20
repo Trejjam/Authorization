@@ -84,7 +84,9 @@ class CliUser extends CliHelper
 
 		if ($create && !is_null($password)) {
 			try {
-				$this->userManager->add($username, $password);
+				if (!$this->userManager->add($username, $password)) {
+					throw new \Exception("User already exist");
+				}
 			}
 			catch (\Exception $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
