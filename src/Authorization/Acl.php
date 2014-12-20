@@ -556,6 +556,24 @@ class AclRole
 
 		return $depth;
 	}
+	/**
+	 * @param array $roleNames
+	 * @return bool
+	 */
+	public function isChildOf(array $roleNames) {
+		$tempThis = $this;
+		if (in_array($tempThis->getName(), $roleNames)) {
+			return TRUE;
+		}
+		while ($tempThis->hasParent()) {
+			$tempThis = $tempThis->getParent();
+			if (in_array($tempThis->getName(), $roleNames)) {
+				return TRUE;
+			}
+		}
+
+		return false;
+	}
 }
 
 class AclResource
