@@ -27,13 +27,23 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	protected $tables;
 	protected $reloadChangedUser;
 
+	/**
+	 * @param Nette\Database\Context $database
+	 * @param Acl                    $acl
+	 */
 	public function __construct(Nette\Database\Context $database, Acl $acl) {
 		$this->database = $database;
 		$this->acl = $acl;
 	}
+	/**
+	 * @param array $tables
+	 */
 	public function setTables(array $tables) {
 		$this->tables = $tables;
 	}
+	/**
+	 * @param $reloadChangedUser
+	 */
 	public function setParams($reloadChangedUser) {
 		$this->reloadChangedUser = $reloadChangedUser;
 	}
@@ -79,6 +89,11 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		return new Nette\Security\Identity($row[$this->tables["users"]["id"]], $role, $arr);
 	}
 
+	/**
+	 * @param $username
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public function isUsernameValid($username) {
 		if (strlen($username) > $this->tables["users"]["username"]["length"]) {
 			throw new \Exception("The username is too long");
@@ -96,8 +111,15 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 					throw new \Exception("The username is not match regex " . $this->tables["users"]["username"]["match"]);
 				}
 		}
+
+		return TRUE;
 	}
 
+	/**
+	 * @param $username
+	 * @return int
+	 * @throws \Exception
+	 */
 	public function getUserId($username) {
 		$this->isUsernameValid($username);
 
@@ -111,6 +133,12 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			throw new \Exception("The user is not exist");
 		}
 	}
+	/**
+	 * @param        $username
+	 * @param string $type [username|id]
+	 * @return Nette\Database\Table\ActiveRow
+	 * @throws \Exception
+	 */
 	protected function getUser($username, $type = "username") {
 		switch ($type) {
 			case "username":
@@ -135,6 +163,11 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		}
 	}
 
+	/**
+	 * @param string $username
+	 * @param string $type [username|id]
+	 * @throws \Exception
+	 */
 	public function setUpdated($username, $type = "username") {
 		$user = $this->getUser($username, $type);
 
@@ -147,6 +180,11 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			throw new \Exception("The user $username:$type not exist");
 		}
 	}
+	/**
+	 * @param string $username
+	 * @param string $password
+	 * @throws \Exception
+	 */
 	public function add($username, $password) {
 		$this->isUsernameValid($username);
 
@@ -156,6 +194,12 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
 	}
+	/**
+	 * @param string $username
+	 * @param string $password
+	 * @param string $type [username|id]
+	 * @throws \Exception
+	 */
 	public function changePassword($username, $password, $type = "username") {
 		$user = $this->getUser($username, $type);
 
@@ -164,6 +208,12 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
 	}
+	/**
+	 * @param string $username
+	 * @param string $status
+	 * @param string $type [username|id]
+	 * @throws \Exception
+	 */
 	public function setStatus($username, $status, $type = "username") {
 		$user = $this->getUser($username, $type);
 
@@ -172,6 +222,12 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
 		]);
 	}
+	/**
+	 * @param string $username
+	 * @param string $activated
+	 * @param string $type [username|id]
+	 * @throws \Exception
+	 */
 	public function setActivated($username, $activated = NULL, $type = "username") {
 		if (is_null($activated)) {
 			$activated = $this->tables["users"]["activated"]["yes"];
@@ -185,6 +241,10 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		]);
 	}
 
+	/**
+	 * @return \stdClass[]
+	 * @throws \Exception
+	 */
 	public function getUsersList() {
 		$out = [];
 
@@ -194,6 +254,12 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 
 		return $out;
 	}
+	/**
+	 * @param string $username
+	 * @param string $type [auto|activeRow|username|id]
+	 * @return \stdClass
+	 * @throws \Exception
+	 */
 	public function getUserInfo($username, $type = "auto") {
 		if ($type == "auto") {
 			if ($username instanceof Nette\Database\Table\ActiveRow) {
