@@ -469,7 +469,7 @@ class AclRole
 	/**
 	 * @param AclRole $role
 	 */
-	public function connectToChild(AclRole $role) {
+	protected function connectToChild(AclRole $role) {
 		$this->child[$role->getId()] = $role;
 	}
 	/**

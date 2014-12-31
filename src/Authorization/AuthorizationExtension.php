@@ -14,7 +14,7 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 {
 	private $defaults = [
 		'tables'            => [
-			'users'     => [
+			'users'       => [
 				'table'     => 'users__users',
 				'id'        => 'id',
 				'status'    => [
@@ -36,26 +36,42 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 					'edited'  => 'date_edited',
 				]
 			],
-			'roles'     => [
+			'roles'       => [
 				'table'    => 'users__roles',
 				'id'       => 'id',
 				'parentId' => 'parent_id',
 				'roleName' => 'name',
 				'info'     => 'info', //value FALSE disable usage
 			],
-			'userRoles' => [
+			'userRoles'   => [
 				'table'  => 'users__user_role',
 				'id'     => 'id',
 				'userId' => 'user_id',
 				'roleId' => 'role_id',
 			],
-			'resource'  => [
+			'resource'    => [
 				'table'          => 'users__resources',
 				'id'             => 'id',
 				'roleId'         => 'role_id',
 				'resourceName'   => 'name',
 				'resourceAction' => 'action', //default ALL
 			],
+			'userRequest' => [
+				'table'  => 'users__user_request',
+				'id'     => 'id',
+				'userId' => 'user_id',
+				'hash'   => [
+					'name'   => 'hash',
+					'length' => 10,
+				],
+				'type'   => [
+					'name'   => 'type',
+					'option' => [
+						'activate',
+						'lostPassword',
+					]
+				]
+			]
 		],
 		'reloadChangedUser' => TRUE, //not implemented yet, for example admin edit user role, then users role will be changed
 		'cache'             => [
@@ -77,6 +93,12 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 									 ->addSetup("setTables", [
 										 "tables" => $config["tables"],
 									 ])->addSetup("init");
+
+		$userRequest = $builder->addDefinition($this->prefix('userRequest'))
+							   ->setClass('Trejjam\Authorization\UserRequest')
+							   ->addSetup("setTables", [
+								   "tables" => $config["tables"],
+							   ]);
 
 		$userManager = $builder->addDefinition($this->prefix('userManager'))
 							   ->setClass('Trejjam\Authorization\UserManager')

@@ -20,7 +20,9 @@ class CliInstall extends Command
 		FILE_ROLES_TABLE = "users__roles",
 		FILE_RESOURCES_TABLE = "users__resources",
 		FILE_USER_ROLE_TABLE = "users__user_role",
+		FILE_PUBLIC_REQUEST_TABLE = "users__roles-data",
 		FILE_ROLES_DATA_TABLE = "users__roles-data";
+
 
 	/**
 	 * @var \Nette\Database\Context @inject
@@ -36,6 +38,7 @@ class CliInstall extends Command
 		$this->database->query($this->getFile(self::FILE_ROLES_TABLE));
 		$this->database->query($this->getFile(self::FILE_RESOURCES_TABLE));
 		$this->database->query($this->getFile(self::FILE_USER_ROLE_TABLE));
+		$this->database->query($this->getFile(self::FILE_PUBLIC_REQUEST_TABLE));
 		$this->database->query($this->getFile(self::FILE_ROLES_DATA_TABLE));
 	}
 	protected function getFile($file) {
