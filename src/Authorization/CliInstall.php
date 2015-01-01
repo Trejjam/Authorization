@@ -20,7 +20,7 @@ class CliInstall extends Command
 		FILE_ROLES_TABLE = "users__roles",
 		FILE_RESOURCES_TABLE = "users__resources",
 		FILE_USER_ROLE_TABLE = "users__user_role",
-		FILE_PUBLIC_REQUEST_TABLE = "users__roles-data",
+		FILE_PUBLIC_REQUEST_TABLE = "users__user_request",
 		FILE_ROLES_DATA_TABLE = "users__roles-data";
 
 
