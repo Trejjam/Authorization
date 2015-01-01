@@ -21,9 +21,9 @@ SET time_zone = "+00:00";
 --
 
 INSERT INTO `users__roles` (`id`, `parent_id`, `name`, `info`) VALUES
-(1, NULL, 'guest', ''),
-(2, NULL, 'authenticated', ''),
-(3, NULL, 'root', '');
+(1, NULL, 'root', ''),
+(2, 1, 'authenticated', ''),
+(3, 2, 'guest', '');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
