@@ -41,7 +41,11 @@ class UserRequest
 			throw new \Exception("Type '$type' is not valid");
 		}
 
-		$hash = Nette\Utils\Random::generate($this->tables['userRequest']['hash']['length'], '0-9A-Z');
+		do {
+			$hash = Nette\Utils\Random::generate($this->tables['userRequest']['hash']['length'], '0-9A-Z');
+		} while($this->getTable()->where([
+			$this->tables['userRequest']['hash']['name'] => $hash,
+		])->fetch());
 
 		$this->getTable()->insert([
 			$this->tables['userRequest']['userId']       => $userId,
