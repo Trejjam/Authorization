@@ -51,12 +51,28 @@ class UserRequest
 
 		return $hash;
 	}
-	public function getType($userId, $hash) {
+	/**
+	 * @param int    $userId
+	 * @param string $hash
+	 * @param bool   $invalidateHash
+	 * @return bool|string
+	 */
+	public function getType($userId, $hash, $invalidateHash = TRUE) {
 		if ($row = $this->getTable()->where([
 			$this->tables['userRequest']['userId']       => $userId,
 			$this->tables['userRequest']['hash']['name'] => $hash,
 		])->fetch()
 		) {
+			if ($row->{$this->tables['userRequest']['used']['name']} == $this->tables['userRequest']['used']['positive']) {
+				return TRUE;
+			}
+
+			if ($invalidateHash) {
+				$row->update([
+					$this->tables['userRequest']['used']['name'] => $this->tables['userRequest']['used']['positive']
+				]);
+			}
+
 			return $row->{$this->tables['userRequest']['type']['name']};
 		}
 

@@ -70,7 +70,11 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 						'activate',
 						'lostPassword',
 					]
-				]
+				],
+				'used'   => [
+					'name'     => 'used',
+					'positive' => 'yes',
+				],
 			]
 		],
 		'reloadChangedUser' => TRUE, //not implemented yet, for example admin edit user role, then users role will be changed
