@@ -35,22 +35,25 @@ class User extends Nette\Security\User
 		}
 	}
 
+	public function logout($clearIdentity = FALSE) {
+		$this->storage->setAction('destroyed');
+
+		parent::logout($clearIdentity);
+	}
 	protected function checkIdentityAction() {
 		if ($this->storage->isAuthenticated()) {
 			$action = $this->storage->getAction();
 
 			if (is_null($action)) {
-				$this->logout();
+				parent::logout();
 			}
 
 			switch ($action) {
 				case 'reload':
-					$this->storage->setAction('destroyed');
 					$this->login($this->getId(), NULL);
 
 					break;
 				case 'logout':
-					$this->storage->setAction('destroyed');
 					$this->logout();
 
 					break;
