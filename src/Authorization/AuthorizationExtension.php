@@ -14,7 +14,7 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 {
 	private $defaults = [
 		'tables'            => [
-			'users'       => [
+			'users'        => [
 				'table'     => 'users__users',
 				'id'        => 'id',
 				'status'    => [
@@ -33,30 +33,29 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 				'password'  => 'password',
 				'timestamp' => [
 					'created' => 'date_created',
-					'edited'  => 'date_edited',
 				]
 			],
-			'roles'       => [
+			'roles'        => [
 				'table'    => 'users__roles',
 				'id'       => 'id',
 				'parentId' => 'parent_id',
 				'roleName' => 'name',
 				'info'     => 'info', //value FALSE disable usage
 			],
-			'userRoles'   => [
+			'userRoles'    => [
 				'table'  => 'users__user_role',
 				'id'     => 'id',
 				'userId' => 'user_id',
 				'roleId' => 'role_id',
 			],
-			'resource'    => [
+			'resource'     => [
 				'table'          => 'users__resources',
 				'id'             => 'id',
 				'roleId'         => 'role_id',
 				'resourceName'   => 'name',
 				'resourceAction' => 'action', //default ALL
 			],
-			'userRequest' => [
+			'userRequest'  => [
 				'table'  => 'users__user_request',
 				'id'     => 'id',
 				'userId' => 'user_id',
@@ -75,9 +74,24 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 					'name'     => 'used',
 					'positive' => 'yes',
 				],
-			]
+			],
+			'identityHash' => [
+				'table'  => 'users__identity_hash',
+				'id'     => 'id',
+				'userId' => 'user_id',
+				'hash'   => 'hash',
+				'action' => [
+					'name'   => 'action',
+					'option' => [
+						'none',
+						'reload',
+						'logout',
+						'destroyed'
+					],
+				],
+			],
 		],
-		'reloadChangedUser' => TRUE, //not implemented yet, for example admin edit user role, then users role will be changed
+		'reloadChangedUser' => TRUE, //for example admin edit user role, then users role will be changed (in user session)
 		'cache'             => [
 			"use"     => FALSE,
 			"name"    => "authorization",
@@ -91,6 +105,20 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 
 		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig($this->defaults);
+
+		$userStorage = $builder->getDefinition('nette.userStorage')
+							   ->setClass('Trejjam\Authorization\UserStorage')
+							   ->setFactory('Trejjam\Authorization\UserStorage')
+							   ->addSetup("setTables", [
+								   "tables" => $config["tables"],
+							   ]);
+
+		$user = $builder->getDefinition('user')
+						->setClass('Trejjam\Authorization\User')
+						->setFactory('Trejjam\Authorization\User')
+						->addSetup("setParams", [
+							"reloadChangedUser" => $config["reloadChangedUser"],
+						]);
 
 		$accessControlList = $builder->addDefinition($this->prefix('acl'))
 									 ->setClass('Trejjam\Authorization\Acl')
@@ -108,9 +136,7 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 							   ->setClass('Trejjam\Authorization\UserManager')
 							   ->addSetup("setTables", [
 								   "tables" => $config["tables"],
-							   ])->addSetup("setParams", [
-				"reloadChangedUser" => $config["reloadChangedUser"],
-			]);
+							   ]);
 
 		if (class_exists('\Symfony\Component\Console\Command\Command')) {
 			$command = [

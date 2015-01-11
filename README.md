@@ -62,6 +62,7 @@ authorization:
 			roleId         : role_id #column name, foreign key to role.id
 			resourceName   : name #column name
 			resourceAction : action #column name, default ALL
+	reloadChangedUser: true
 	cache : 
 		use     : false
 		name    : authorization

@@ -25,7 +25,6 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	protected $acl;
 
 	protected $tables;
-	protected $reloadChangedUser;
 
 	/**
 	 * @param Nette\Database\Context $database
@@ -41,12 +40,6 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	public function setTables(array $tables) {
 		$this->tables = $tables;
 	}
-	/**
-	 * @param $reloadChangedUser
-	 */
-	public function setParams($reloadChangedUser) {
-		$this->reloadChangedUser = $reloadChangedUser;
-	}
 
 	/**
 	 * Performs an authentication.
@@ -58,17 +51,18 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		list($username, $password) = $credentials;
 
 		$row = $this->database->table($this->tables["users"]["table"])
-							  ->where($this->tables["users"]["username"]["name"], $username)->fetch();
+							  ->where(is_null($password) ? $this->tables["users"]["id"] : $this->tables["users"]["username"]["name"], $username)
+							  ->fetch();
 
 		if (!$row) {
 			throw new Nette\Security\AuthenticationException('The username is incorrect.', self::IDENTITY_NOT_FOUND);
 
 		}
-		elseif (!Passwords::verify($password, $row[$this->tables["users"]["password"]])) {
+		elseif (!is_null($password) && !Passwords::verify($password, $row[$this->tables["users"]["password"]])) {
 			throw new Nette\Security\AuthenticationException('The password is incorrect.', self::INVALID_CREDENTIAL);
 
 		}
-		elseif (Passwords::needsRehash($row[$this->tables["users"]["password"]])) {
+		elseif (!is_null($password) && Passwords::needsRehash($row[$this->tables["users"]["password"]])) {
 			$row->update(array(
 				$this->tables["users"]["password"] => Passwords::hash($password),
 			));
@@ -172,8 +166,11 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		$user = $this->getUser($username, $type);
 
 		if ($user) {
-			$user->update([
-				$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
+			$this->database->table($this->tables['identityHash']['table'])->where([
+				$this->tables['identityHash']['userId']         => $user->{$this->tables["users"]["id"]},
+				$this->tables['identityHash']['action']['name'] => 'none',
+			])->update([
+				$this->tables['identityHash']['action']['name'] => 'reload',
 			]);
 		}
 		else {
@@ -191,16 +188,18 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 
 		try {
 			$this->getUser($username);
-			return false;
+
+			return FALSE;
 		}
-		catch(\Exception $e) {}
+		catch (\Exception $e) {
+		}
 
 		$this->database->table($this->tables["users"]["table"])->insert([
-			$this->tables["users"]["username"]["name"]    => $username,
-			$this->tables["users"]["password"]            => Passwords::hash($password),
-			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
+			$this->tables["users"]["username"]["name"] => $username,
+			$this->tables["users"]["password"]         => Passwords::hash($password),
 		]);
-		return true;
+
+		return TRUE;
 	}
 	/**
 	 * @param string $username
@@ -212,8 +211,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		$user = $this->getUser($username, $type);
 
 		$user->update([
-			$this->tables["users"]["password"]            => Passwords::hash($password),
-			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
+			$this->tables["users"]["password"] => Passwords::hash($password),
 		]);
 	}
 	/**
@@ -226,8 +224,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		$user = $this->getUser($username, $type);
 
 		$user->update([
-			$this->tables["users"]["status"]["name"]      => $status,
-			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
+			$this->tables["users"]["status"]["name"] => $status,
 		]);
 	}
 	/**
@@ -244,8 +241,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		$user = $this->getUser($username, $type);
 
 		$user->update([
-			$this->tables["users"]["activated"]["name"]   => $activated,
-			$this->tables["users"]["timestamp"]["edited"] => new Nette\Database\SqlLiteral('NOW()'),
+			$this->tables["users"]["activated"]["name"] => $activated,
 		]);
 	}
 
@@ -302,7 +298,6 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			$usersTable["activated"]["name"],
 			$usersTable["username"]["name"],
 			$usersTable["timestamp"]["created"],
-			$usersTable["timestamp"]["edited"],
 		];
 
 		$out = new \stdClass;

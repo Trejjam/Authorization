@@ -21,7 +21,8 @@ class CliInstall extends Command
 		FILE_RESOURCES_TABLE = "users__resources",
 		FILE_USER_ROLE_TABLE = "users__user_role",
 		FILE_USER_REQUEST_TABLE = "users__user_request",
-		FILE_ROLES_DATA_TABLE = "users__roles-data";
+		FILE_ROLES_DATA_TABLE = "users__roles-data",
+		FILE_IDENTITY_HASH_TABLE = "users__roles-data";
 
 
 	/**
@@ -40,8 +41,9 @@ class CliInstall extends Command
 		$this->database->query($this->getFile(self::FILE_USER_ROLE_TABLE));
 		$this->database->query($this->getFile(self::FILE_USER_REQUEST_TABLE));
 		$this->database->query($this->getFile(self::FILE_ROLES_DATA_TABLE));
+		$this->database->query($this->getFile(self::FILE_IDENTITY_HASH_TABLE));
 	}
 	protected function getFile($file) {
-		return file_get_contents(__DIR__."/../../sql/". $file.".sql");
+		return file_get_contents(__DIR__ . "/../../../sql/" . $file . ".sql");
 	}
 }

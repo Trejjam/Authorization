@@ -28,8 +28,7 @@ CREATE TABLE IF NOT EXISTS `users__users` (
   `activated` enum('no','yes') COLLATE utf8_czech_ci NOT NULL DEFAULT 'no',
   `username` varchar(60) COLLATE utf8_czech_ci NOT NULL,
   `password` text COLLATE utf8_czech_ci NOT NULL,
-  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `date_edited` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
 --
