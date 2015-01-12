@@ -114,7 +114,7 @@ class CliRole extends CliHelper
 		if ($viewRole) {
 			$output->writeln("Roles:");
 
-			foreach ($this->acl->getRoles_() as $v) {
+			foreach ($this->acl->getTrees()->getRootRoles() as $v) {
 				$this->drawRole($output, $v);
 			}
 		}

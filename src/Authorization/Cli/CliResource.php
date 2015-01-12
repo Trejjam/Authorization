@@ -63,7 +63,7 @@ class CliResource extends CliHelper
 		if ($viewResource) {
 			$output->writeln("Resource:");
 
-			foreach ($this->acl->getResource_() as $v) {
+			foreach ($this->acl->getTrees()->getResources() as $v) {
 				$output->writeln($v->getNameRaw() . ":" . $v->getActionRaw());
 			}
 		}

@@ -93,7 +93,7 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 		],
 		'reloadChangedUser' => TRUE, //for example admin edit user role, then users role will be changed (in user session)
 		'cache'             => [
-			"use"     => FALSE,
+			"use"     => TRUE,
 			"name"    => "authorization",
 			"timeout" => "10 minutes"
 		],
