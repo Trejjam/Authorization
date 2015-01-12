@@ -64,7 +64,7 @@ authorization:
 			resourceAction : action #column name, default ALL
 	reloadChangedUser: true
 	cache : 
-		use     : false
+		use     : true
 		name    : authorization
 		timeout : 10 minutes    
 	debugger:false #not implemented yet
