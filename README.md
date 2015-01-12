@@ -7,7 +7,7 @@ Library for
 <li>roles</li>
 <li>resource</li>
 </ul>
-in [Nette](http://nette.org) over database
+in [Nette](http://nette.org) using database
 
 Installation
 ------------
@@ -201,14 +201,51 @@ Presenter:
 	/**
 	* @var \Trejjam\Authorization\Acl @inject
 	*/
-	public $authorization;
+	public $acl;
 	/**
 	* @var \Trejjam\Authorization\UserManager @inject
 	*/
 	public $userManager;
+	/**
+	* @var \Trejjam\Authorization\UserRequest @inject
+	*/
+	public $userRequest;
 	
 	function renderDefault() {
+		dump($this->acl->getTrees()->getRootRoles()); //get all roles without parent
+		dump($this->acl->getTrees()->getRoles()); //get all roles
+		dump($this->acl->getTrees()->getResources()); //get all resource
 		
+		$this->acl->createRole($name, $parent, $info);
+		$this->acl->deleteRole($name);
+		$this->acl->moveRole($name, $parent);
 		
+		dump($this->acl->getRoleByName($roleName)); //return AclRole with "name"
+	
+		$this->acl->createResource($name, $action, $roleName);
+        $this->acl->deleteResource($name, $action);
+        $this->acl->moveResource($name, $action, $roleName);
+        
+        dump($this->acl->getResourceById($id)); //return AclResource
+        
+        dump($this->acl->getUserRoles($userId)); //return AclRole[] 
+        $this->acl->addUserRole($userId, $roleName);
+        $this->acl->removeUserRole($userId, $roleName);
+        
+        //--------------userManager--------------
+        
+        $this->userManager->add($username, $password);
+        $this->userManager->changePassword($username, $password, $type = "username"); //$type could be username|id
+        $this->userManager->setUpdated($username, $type = "username"); //next user request user session will be reload (if "reloadChangedUser: true")
+        $this->userManager->setStatus($username, $status, $type = "username"); //$status could be enable|disable - if user with disable status try login, login function return exception
+        $this->userManager->setActivated($username, $activated = NULL, $type = "username"); //$activated could be yes|no - if user with 'no' activated try login, login function return exception
+        dump($this->userManager->getUserId($username)); //return id of user
+        $this->userManager->getUserInfo($username, $type = "auto"); //return all information about user except password
+        $this->userManager->getUsersList(); //return getUserInfo[] for all users
+        
+        //--------------userRequest--------------
+        
+        dump($this->userRequest->generateHash($userId, $type)); //return hash for public usage, $type could be activate|lostPassword 
+        dump($this->userRequest->getType($userId, $hash, $invalidateHash = FALSE)); //return TRUE - hash was used|$type|FALSE - user hasn't this hash, $invalidateHash=TRUE - disable future hash usage
 	}
 ```

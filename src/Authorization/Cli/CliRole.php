@@ -87,7 +87,7 @@ class CliRole extends CliHelper
 		if ($move) {
 			if (!is_null($role)) {
 				try {
-					$this->acl->setRoleParent($role, $parentRole);
+					$this->acl->moveRole($role, $parentRole);
 				}
 				catch (\Exception $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");

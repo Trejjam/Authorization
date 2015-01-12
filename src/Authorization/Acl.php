@@ -100,21 +100,6 @@ class Acl extends Nette\Security\Permission
 		$this->allow($resource->getRole()->getName(), $resource->getName(), $resource->getAction());
 	}
 
-
-	/**
-	 * @param $role
-	 * @return null|AclRole
-	 */
-	public function getRoleByName($role) {
-		foreach ($this->getTrees()->getRoles() as $v) {
-			if ($v->getName() == $role) {
-				return $v;
-			}
-		}
-
-		return NULL;
-	}
-
 	/**
 	 * @param int $id
 	 * @return array
@@ -218,7 +203,7 @@ class Acl extends Nette\Security\Permission
 	 * @param string $parent
 	 * @throws \Exception
 	 */
-	public function setRoleParent($role, $parent) {
+	public function moveRole($role, $parent) {
 		$dbArr = [
 			$this->tables["roles"]["parentId"] => NULL,
 		];
@@ -274,6 +259,19 @@ class Acl extends Nette\Security\Permission
 		}
 
 		$this->reset();
+	}
+	/**
+	 * @param $role
+	 * @return null|AclRole
+	 */
+	public function getRoleByName($role) {
+		foreach ($this->getTrees()->getRoles() as $v) {
+			if ($v->getName() == $role) {
+				return $v;
+			}
+		}
+
+		return NULL;
 	}
 	protected function findCircle(AclRole $role, AclRole $parent) {
 		if ($role->getId() == $parent->getId()) {
