@@ -78,7 +78,10 @@ class CliResource extends CliHelper
 
 						$this->acl->createResource($rName, $rAction, $parentRole);
 					}
-					catch (\Exception $e) {
+					catch (ResourceException $e) {
+						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
+					}
+					catch (RoleException $e) {
 						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 					}
 				}
@@ -100,7 +103,10 @@ class CliResource extends CliHelper
 
 						$this->acl->moveResource($rName, $rAction, $parentRole);
 					}
-					catch (\Exception $e) {
+					catch (ResourceException $e) {
+						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
+					}
+					catch (RoleException $e) {
 						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 					}
 				}
@@ -121,7 +127,7 @@ class CliResource extends CliHelper
 
 					$this->acl->deleteResource($rName, $rAction);
 				}
-				catch (\Exception $e) {
+				catch (ResourceException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}

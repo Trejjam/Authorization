@@ -61,7 +61,7 @@ class Acl extends Nette\Security\Permission
 				$this->setupResource($v);
 			}
 		}
-		catch (TableNotFound $e) {
+		catch (TableNotFoundException $e) {
 			dump($e->getMessage());
 		}
 	}
@@ -117,7 +117,7 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param int    $userId
 	 * @param string $roleName
-	 * @throws \Exception
+	 * @throws RoleException
 	 */
 	public function addUserRole($userId, $roleName) {
 		$role = $this->getRoleByName($roleName);
@@ -134,7 +134,7 @@ class Acl extends Nette\Security\Permission
 				$this->database->table($this->tables["userRoles"]["table"])->insert($roleArr);
 			}
 			else {
-				throw new \Exception("The user is already member of the role: " . $roleName);
+				throw new RoleException("The user is already member of the role: " . $roleName);
 			}
 		}
 	}
@@ -159,7 +159,7 @@ class Acl extends Nette\Security\Permission
 	 * @param string      $role
 	 * @param string|null $parent
 	 * @param string      $info
-	 * @throws \Exception
+	 * @throws RoleException
 	 */
 	public function createRole($role, $parent = NULL, $info = "") {
 		$dbArr = [
@@ -170,7 +170,7 @@ class Acl extends Nette\Security\Permission
 		if (!is_null($parent)) {
 			$parentRole = $this->getRoleByName($parent);
 			if (is_null($parentRole)) {
-				throw new \Exception("Role " . $parent . " not exist");
+				throw new RoleException("Role " . $parent . " not exist");
 			}
 
 			$dbArr[$this->tables["roles"]["parentId"]] = $parentRole->getId();
@@ -178,7 +178,7 @@ class Acl extends Nette\Security\Permission
 
 		$roleDb = $this->database->table($this->tables["roles"]["table"])->where($dbArr)->fetch();
 		if ($roleDb) {
-			throw new \Exception("Role " . $role . " already exist");
+			throw new RoleException("Role " . $role . " already exist");
 		}
 
 		if (is_string($this->tables["roles"]["info"])) {
@@ -201,7 +201,7 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param string $role
 	 * @param string $parent
-	 * @throws \Exception
+	 * @throws RoleException
 	 */
 	public function moveRole($role, $parent) {
 		$dbArr = [
@@ -210,19 +210,19 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new \Exception("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist");
 		}
 
 		if (!is_null($parent)) {
 			$aclParent = $this->getRoleByName($parent);
 			if (is_null($aclParent)) {
-				throw new \Exception("Role " . $parent . " not exist");
+				throw new RoleException("Role " . $parent . " not exist");
 			}
 
 			$dbArr[$this->tables["roles"]["parentId"]] = $aclParent->getId();
 
 			if ($this->findCircle($aclRole, $aclParent)) {
-				throw new \Exception("Connecting role ($role) to parent ($parent) forming a circle");
+				throw new RoleException("Connecting role ($role) to parent ($parent) forming a circle");
 			}
 		}
 
@@ -236,13 +236,13 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param string $role
 	 * @param bool   $force
-	 * @throws \Exception
+	 * @throws RoleException
 	 */
 	public function deleteRole($role, $force = FALSE) {
 		$aclRole = $this->getRoleByName($role);
 
 		if (is_null($aclRole)) {
-			throw new \Exception("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist");
 		}
 
 		if ($force) {
@@ -289,7 +289,8 @@ class Acl extends Nette\Security\Permission
 	 * @param string      $resource
 	 * @param string|null $resourceAction
 	 * @param string      $role
-	 * @throws \Exception
+	 * @throws ResourceException
+	 * @throws RoleException
 	 */
 	public function createResource($resource, $resourceAction = NULL, $role) {
 		$dbArr = [
@@ -299,17 +300,17 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new \Exception("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist");
 		}
 
 		$dbArr[$this->tables["resource"]["roleId"]] = $aclRole->getId();
 
 		$resourceDb = $this->database->table($this->tables["resource"]["table"])->where($dbArr)->fetch();
 		if ($resourceDb) {
-			throw new \Exception("Resource " . $resource . " already exist");
+			throw new ResourceException("Resource " . $resource . " already exist");
 		}
 
-		$DBresource=$this->database->table($this->tables["resource"]["table"])->insert($dbArr);
+		$DBresource = $this->database->table($this->tables["resource"]["table"])->insert($dbArr);
 
 		$tableInfo = $this->tables["resource"];
 		unset($tableInfo["table"]);
@@ -323,7 +324,8 @@ class Acl extends Nette\Security\Permission
 	 * @param string      $resource
 	 * @param string|null $resourceAction
 	 * @param string      $role
-	 * @throws \Exception
+	 * @throws ResourceException
+	 * @throws RoleException
 	 */
 	public function moveResource($resource, $resourceAction = NULL, $role) {
 		$dbArr = [];
@@ -332,7 +334,7 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new \Exception("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist");
 		}
 
 		$dbArr[$this->tables["resource"]["roleId"]] = $aclRole->getId();
@@ -344,7 +346,7 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param string      $resource
 	 * @param string|null $resourceAction
-	 * @throws \Exception
+	 * @throws ResourceException
 	 */
 	public function deleteResource($resource, $resourceAction = NULL) {
 		$resourceDb = $this->getResource($resource, $resourceAction);
@@ -357,7 +359,7 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param int $id
 	 * @return AclResource
-	 * @throws \Exception
+	 * @throws ResourceException
 	 */
 	public function getResourceById($id) {
 		$resources = $this->getTrees()->getResources();
@@ -366,7 +368,7 @@ class Acl extends Nette\Security\Permission
 			return $resources[$id];
 		}
 		else {
-			throw new \Exception("Resource not exist");
+			throw new ResourceException("Resource not exist");
 		}
 	}
 	protected function getResource($resource, $resourceAction = NULL) {
@@ -381,7 +383,7 @@ class Acl extends Nette\Security\Permission
 			return $resourceDb;
 		}
 		else {
-			throw new \Exception("Resource $resource:$resourceAction not exist");
+			throw new ResourceException("Resource $resource:$resourceAction not exist");
 		}
 	}
 
@@ -452,7 +454,7 @@ class Trees
 
 	protected function createRolesTree(Nette\Database\Context $database, array $tables) {
 		if (!$database->query("SHOW TABLES LIKE '" . $tables["roles"]["table"] . "'")->getRowCount()) {
-			throw new TableNotFound("Table " . $tables["roles"]["table"] . " not exist");
+			throw new TableNotFoundException("Table " . $tables["roles"]["table"] . " not exist");
 		}
 		foreach ($database->table($tables["roles"]["table"]) as $v) {
 			$tableInfo = $tables["roles"];
@@ -487,7 +489,7 @@ class Trees
 	}
 	protected function createResourceTree(Nette\Database\Context $database, array $tables) {
 		if (!$database->query("SHOW TABLES LIKE '" . $tables["resource"]["table"] . "'")->getRowCount()) {
-			throw new TableNotFound("Table " . $tables["resource"]["table"] . " not exist");
+			throw new TableNotFoundException("Table " . $tables["resource"]["table"] . " not exist");
 		}
 		foreach ($database->table($tables["resource"]["table"]) as $v) {
 			$tableInfo = $tables["resource"];
@@ -611,10 +613,10 @@ class AclRole
 	}
 	/**
 	 * @return string
-	 * @throws \Exception
+	 * @throws UserConfigurationException
 	 */
 	public function getInfo() {
-		if ($this->info === FALSE) throw new \Exception("This field was disabled in configuration");
+		if ($this->info === FALSE) throw new UserConfigurationException("Field 'info' was disabled in configuration");
 
 		return $this->info;
 	}
@@ -729,7 +731,22 @@ class AclResource
 	}
 }
 
-class TableNotFound extends \Exception
+class TableNotFoundException extends \Exception
+{
+
+}
+
+class RoleException extends \Exception
+{
+
+}
+
+class ResourceException extends \Exception
+{
+
+}
+
+class UserConfigurationException extends \Exception
 {
 
 }

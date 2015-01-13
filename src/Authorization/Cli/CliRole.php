@@ -76,7 +76,7 @@ class CliRole extends CliHelper
 				try {
 					$this->acl->createRole($role, $parentRole, $info);
 				}
-				catch (\Exception $e) {
+				catch (RoleException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}
@@ -89,7 +89,7 @@ class CliRole extends CliHelper
 				try {
 					$this->acl->moveRole($role, $parentRole);
 				}
-				catch (\Exception $e) {
+				catch (RoleException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}
@@ -102,7 +102,7 @@ class CliRole extends CliHelper
 				try {
 					$this->acl->deleteRole($role, $forceDelete);
 				}
-				catch (\Exception $e) {
+				catch (RoleException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}

@@ -85,10 +85,10 @@ class CliUser extends CliHelper
 		if ($create && !is_null($password)) {
 			try {
 				if (!$this->userManager->add($username, $password)) {
-					throw new \Exception("User already exist");
+					throw new UserManagerException("User already exist");
 				}
 			}
-			catch (\Exception $e) {
+			catch (UserManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -96,7 +96,7 @@ class CliUser extends CliHelper
 			try {
 				$this->userManager->changePassword($username, $password);
 			}
-			catch (\Exception $e) {
+			catch (UserManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -108,7 +108,7 @@ class CliUser extends CliHelper
 				$userId = $this->userManager->getUserId($username);
 				$this->userManager->setUpdated($userId, "id");
 			}
-			catch (\Exception $e) {
+			catch (UserManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -119,7 +119,7 @@ class CliUser extends CliHelper
 				$userId = $this->userManager->getUserId($username);
 				$this->userManager->setUpdated($userId, "id");
 			}
-			catch (\Exception $e) {
+			catch (UserManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -133,7 +133,7 @@ class CliUser extends CliHelper
 
 				$this->userManager->setUpdated($userId, "id");
 			}
-			catch (\Exception $e) {
+			catch (UserManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -146,7 +146,7 @@ class CliUser extends CliHelper
 
 				$this->userManager->setUpdated($userId, "id");
 			}
-			catch (\Exception $e) {
+			catch (UserManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -158,7 +158,7 @@ class CliUser extends CliHelper
 				$output->writeln("User roles:");
 				$output->writeln($roles);
 			}
-			catch (\Exception $e) {
+			catch (UserManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}

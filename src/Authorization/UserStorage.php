@@ -89,7 +89,7 @@ class UserStorage extends Nette\Http\UserStorage
 	}
 	public function getAction() {
 		if (is_null($identity = $this->getIdentity())) {
-			throw new \Exception("Identity not exist");
+			throw new UserStorageException("Identity not exist");
 		}
 
 		$hash = $identity->hash;
@@ -104,11 +104,11 @@ class UserStorage extends Nette\Http\UserStorage
 	}
 	public function setAction($action) {
 		if (!in_array($action, $this->tables['identityHash']['action']['option'])) {
-			throw new \Exception("Action '$action' is not enabled.");
+			throw new UserStorageException("Action '$action' is not enabled.");
 		}
 
 		if (is_null($identity = $this->getIdentity())) {
-			throw new \Exception("Identity not exist");
+			throw new UserStorageException("Identity not exist");
 		}
 
 		$hash = $identity->hash;
@@ -117,4 +117,9 @@ class UserStorage extends Nette\Http\UserStorage
 			$this->tables['identityHash']['action']['name'] => $action,
 		]);
 	}
+}
+
+class UserStorageException extends \Exception
+{
+
 }

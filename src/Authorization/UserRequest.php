@@ -38,7 +38,7 @@ class UserRequest
 
 	public function generateHash($userId, $type) {
 		if (!$this->isTypeValid($type)) {
-			throw new \Exception("Type '$type' is not valid");
+			throw new UserRequestException("Type '$type' is not valid");
 		}
 
 		do {
@@ -82,4 +82,9 @@ class UserRequest
 
 		return FALSE;
 	}
+}
+
+class UserRequestException extends \Exception
+{
+
 }
