@@ -30,7 +30,6 @@ class Acl extends Nette\Security\Permission
 	protected $database;
 
 	protected $tables;
-	protected $reloadChangedUser;
 
 	/**
 	 * @var Acl\Trees
