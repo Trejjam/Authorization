@@ -33,7 +33,7 @@ class Acl extends Nette\Security\Permission
 	protected $reloadChangedUser;
 
 	/**
-	 * @var Trees
+	 * @var Acl\Trees
 	 */
 	protected $trees = NULL;
 
@@ -72,15 +72,15 @@ class Acl extends Nette\Security\Permission
 	}
 
 	/**
-	 * @return Trees
+	 * @return Acl\Trees
 	 */
 	public function getTrees() {
 		return is_null($this->trees) ? ($this->trees = $this->cacheLoad(self::CACHE_TREES, function () {
-			return new Trees($this->database, $this->tables);
+			return new Acl\Trees($this->database, $this->tables);
 		})) : $this->trees;
 	}
 
-	protected function setupRoles(AclRole $role) {
+	protected function setupRoles(Acl\Role $role) {
 		if ($role->hasChild()) {
 			$parents = [];
 			foreach ($role->getChild() as $v) {
@@ -93,7 +93,7 @@ class Acl extends Nette\Security\Permission
 			$this->addRole($role->getName());
 		}
 	}
-	protected function setupResource(AclResource $resource) {
+	protected function setupResource(Acl\Resource $resource) {
 		if ($resource->getName() === $resource->getNameRaw() && !$this->hasResource($resource->getName())) {
 			$this->addResource($resource->getName());
 		}
@@ -193,7 +193,7 @@ class Acl extends Nette\Security\Permission
 			unset($tableInfo["info"]);
 		}
 
-		$aclRole = new AclRole($DBrole, $tableInfo);
+		$aclRole = new Acl\Role($DBrole, $tableInfo);
 		$this->getTrees()->registerRole($aclRole);
 
 		$this->invalidateCache();
@@ -262,7 +262,7 @@ class Acl extends Nette\Security\Permission
 	}
 	/**
 	 * @param $role
-	 * @return null|AclRole
+	 * @return null|Acl\Role
 	 */
 	public function getRoleByName($role) {
 		foreach ($this->getTrees()->getRoles() as $v) {
@@ -273,7 +273,7 @@ class Acl extends Nette\Security\Permission
 
 		return NULL;
 	}
-	protected function findCircle(AclRole $role, AclRole $parent) {
+	protected function findCircle(Acl\Role $role, Acl\Role $parent) {
 		if ($role->getId() == $parent->getId()) {
 			return TRUE;
 		}
@@ -315,8 +315,8 @@ class Acl extends Nette\Security\Permission
 		$tableInfo = $this->tables["resource"];
 		unset($tableInfo["table"]);
 
-		$aclResource = new AclRole($DBresource, $tableInfo);
-		$this->getTrees()->registerResource($aclResource);
+		$AclResource = new Acl\Role($DBresource, $tableInfo);
+		$this->getTrees()->registerResource($AclResource);
 
 		$this->invalidateCache();
 	}
@@ -358,7 +358,7 @@ class Acl extends Nette\Security\Permission
 
 	/**
 	 * @param int $id
-	 * @return AclResource
+	 * @return Acl\Resource
 	 * @throws ResourceException
 	 */
 	public function getResourceById($id) {
@@ -430,303 +430,5 @@ class Acl extends Nette\Security\Permission
 		}
 
 		return NULL;
-	}
-}
-
-class Trees
-{
-	/**
-	 * @var AclRole[]
-	 */
-	protected $roles = [];
-	/**
-	 * @var AclRole[]
-	 */
-	protected $rootRoles = [];
-	/**
-	 * @var AclResource[]
-	 */
-	protected $resource = [];
-
-	function __construct(Nette\Database\Context $database, array $tables) {
-		$this->createRolesTree($database, $tables);
-	}
-
-	protected function createRolesTree(Nette\Database\Context $database, array $tables) {
-		if (!$database->query("SHOW TABLES LIKE '" . $tables["roles"]["table"] . "'")->getRowCount()) {
-			throw new TableNotFoundException("Table " . $tables["roles"]["table"] . " not exist");
-		}
-		foreach ($database->table($tables["roles"]["table"]) as $v) {
-			$tableInfo = $tables["roles"];
-			unset($tableInfo["table"]);
-			if ($tableInfo["info"] === FALSE) {
-				unset($tableInfo["info"]);
-			}
-
-			$this->registerRole(new AclRole($v, $tableInfo), FALSE);
-		}
-
-		foreach ($this->roles as $v) {
-			$v->connectToParent($this->roles);
-
-			if (!$v->hasParent()) {
-				$this->rootRoles[$v->getId()] = $v;
-			}
-		}
-
-		$this->createResourceTree($database, $tables);
-	}
-	public function registerRole(AclRole $role, $connect = TRUE) {
-		$this->roles[$role->getId()] = $role;
-
-		if ($connect) {
-			$role->connectToParent($this->roles);
-
-			if (!$role->hasParent()) {
-				$this->rootRoles[$role->getId()] = $role;
-			}
-		}
-	}
-	protected function createResourceTree(Nette\Database\Context $database, array $tables) {
-		if (!$database->query("SHOW TABLES LIKE '" . $tables["resource"]["table"] . "'")->getRowCount()) {
-			throw new TableNotFoundException("Table " . $tables["resource"]["table"] . " not exist");
-		}
-		foreach ($database->table($tables["resource"]["table"]) as $v) {
-			$tableInfo = $tables["resource"];
-			unset($tableInfo["table"]);
-
-			$this->registerResource(new AclResource($v, $tableInfo));
-		}
-	}
-	public function registerResource(AclResource $resource) {
-		$this->resource[$resource->getId()] = $resource;
-
-		$resource->connectToRole($this->roles);
-	}
-
-	/**
-	 * @return AclRole[]
-	 */
-	public function getRoles() {
-		return $this->roles;
-	}
-	/**
-	 * @return AclRole[]
-	 */
-	public function getRootRoles() {
-		return $this->rootRoles;
-	}
-	/**
-	 * @return AclResource[]
-	 */
-	public function getResources() {
-		return $this->resource;
-	}
-}
-
-class AclRole
-{
-	protected $id;
-	protected $parentId;
-	protected $roleName;
-	protected $info = FALSE;
-
-	/**
-	 * @var AclRole
-	 */
-	protected $parent = NULL;
-	/**
-	 * @var AclRole[]
-	 */
-	protected $child = [];
-
-	/**
-	 * @var AclResource[]
-	 */
-	protected $resources = [];
-
-	function __construct(Nette\Database\Table\IRow $row, array $tableInfo) {
-		foreach ($tableInfo as $k => $v) {
-			$this->{is_numeric($k) ? $v : $k} = $row->$v;
-		}
-	}
-
-	/**
-	 * @param array $roles
-	 */
-	public function connectToParent(array $roles) {
-		if (!$this->hasParent()) return;
-		$this->parent = $roles[$this->parentId];
-		$this->parent->connectToChild($this);
-	}
-	/**
-	 * @param AclRole $role
-	 */
-	protected function connectToChild(AclRole $role) {
-		$this->child[$role->getId()] = $role;
-	}
-	/**
-	 * @param AclResource $resource
-	 */
-	public function addResource(AclResource $resource) {
-		$this->resources[$resource->getId()] = $resource;
-	}
-	/**
-	 * @param array $role
-	 */
-	public function fillArrays(array &$role, array &$resource) {
-		$role[$this->getId()] = $this;
-		foreach ($this->resources as $k => $v) {
-			$resource[$k] = $v;
-		}
-
-		foreach ($this->child as $v) {
-			$v->fillArrays($role, $resource);
-		}
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function hasParent() {
-		return isset($this->parentId);
-	}
-	/**
-	 * @return bool
-	 */
-	public function hasChild() {
-		return count($this->child) > 0;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
-	/**
-	 * @return string
-	 */
-	public function getName() {
-		return $this->roleName;
-	}
-	/**
-	 * @return string
-	 * @throws UserConfigurationException
-	 */
-	public function getInfo() {
-		if ($this->info === FALSE) throw new UserConfigurationException("Field 'info' was disabled in configuration");
-
-		return $this->info;
-	}
-
-	/**
-	 * @return AclRole|null
-	 */
-	public function getParent() {
-		return $this->hasParent() ? $this->parent : NULL;
-	}
-	/**
-	 * @return AclRole[]
-	 */
-	public function getChild() {
-		return $this->child;
-	}
-
-	/**
-	 * @return AclResource[]
-	 */
-	public function getResource() {
-		return $this->resources;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getDepth() {
-		$depth = 0;
-
-		$tempThis = $this;
-		while ($tempThis->hasParent()) {
-			$tempThis = $tempThis->getParent();
-			$depth++;
-		}
-
-		return $depth;
-	}
-	/**
-	 * @param array $roleNames
-	 * @return bool
-	 */
-	public function isChildOf(array $roleNames) {
-		$tempThis = $this;
-		if (in_array($tempThis->getName(), $roleNames)) {
-			return TRUE;
-		}
-		while ($tempThis->hasParent()) {
-			$tempThis = $tempThis->getParent();
-			if (in_array($tempThis->getName(), $roleNames)) {
-				return TRUE;
-			}
-		}
-
-		return FALSE;
-	}
-}
-
-class AclResource
-{
-	protected $id;
-	protected $roleId;
-	protected $resourceName;
-	protected $resourceAction;
-
-	/**
-	 * @var AclRole
-	 */
-	protected $role = NULL;
-
-	function __construct(Nette\Database\Table\IRow $row, array $tableInfo) {
-		foreach ($tableInfo as $k => $v) {
-			$this->{is_numeric($k) ? $v : $k} = $row->$v;
-		}
-	}
-
-	/**
-	 * @param AclRole[] $roles
-	 */
-	public function connectToRole($roles) {
-		$this->role = $roles[$this->roleId];
-		$this->role->addResource($this);
-	}
-
-	public function getId() {
-		return $this->id;
-	}
-	public function getNameRaw() {
-		return $this->resourceName;
-	}
-	public function getName() {
-		return defined('\Nette\Security\Permission::' . $this->resourceName)
-			? constant('\Nette\Security\Permission::' . $this->resourceName)
-			: $this->resourceName;
-	}
-	public function getActionRaw() {
-		return $this->resourceAction;
-	}
-	public function getAction() {
-		return defined('\Nette\Security\Permission::' . $this->resourceAction)
-			? constant('\Nette\Security\Permission::' . $this->resourceAction)
-			: $this->resourceAction;
-	}
-	public function getAllowedList() {
-		return [
-			$this->getName(),
-			$this->getAction(),
-		];
-	}
-	public function getRole() {
-		return $this->role;
 	}
 }
