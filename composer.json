@@ -20,7 +20,8 @@
 	  "nette/di": "~2.2",
 	  "nette/security": "~2.2",
 	  "nette/http": "~2.2",
-	  "nette/database": "~2.2"
+	  "nette/database": "~2.2",
+	  "tracy/tracy": "~2.2"
   },
   "require-dev": {
 	"nette/tester": "@dev"
