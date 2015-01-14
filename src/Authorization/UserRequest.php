@@ -83,8 +83,3 @@ class UserRequest
 		return FALSE;
 	}
 }
-
-class UserRequestException extends \Exception
-{
-
-}

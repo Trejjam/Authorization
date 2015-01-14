@@ -730,23 +730,3 @@ class AclResource
 		return $this->role;
 	}
 }
-
-class TableNotFoundException extends \Exception
-{
-
-}
-
-class RoleException extends \Exception
-{
-
-}
-
-class ResourceException extends \Exception
-{
-
-}
-
-class UserConfigurationException extends \Exception
-{
-
-}

@@ -309,8 +309,3 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		return $out;
 	}
 }
-
-class UserManagerException extends \Exception
-{
-
-}

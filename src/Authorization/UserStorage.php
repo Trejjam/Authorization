@@ -118,8 +118,3 @@ class UserStorage extends Nette\Http\UserStorage
 		]);
 	}
 }
-
-class UserStorageException extends \Exception
-{
-
-}
