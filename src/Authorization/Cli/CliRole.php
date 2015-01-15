@@ -120,7 +120,7 @@ class CliRole extends CliHelper
 		}
 	}
 
-	protected function drawRole(OutputInterface $output, AclRole $role, $depth = 0) {
+	protected function drawRole(OutputInterface $output, Acl\Role $role, $depth = 0) {
 		$output->writeln(Nette\Utils\Strings::padLeft('', $depth, ' ') . '\_ ' . $role->getName());
 
 		$resource = [];
