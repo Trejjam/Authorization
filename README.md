@@ -15,7 +15,7 @@ Installation
 The best way to install Trejjam/Authorization is using  [Composer](http://getcomposer.org/):
 
 ```sh
-$ composer require trejjam/authorization:dev-master
+$ composer require trejjam/authorization:v0.6
 ```
 
 Configuration
