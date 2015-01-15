@@ -281,9 +281,6 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 
 				break;
 			case "username":
-				$user = $this->getUser($username);
-
-				break;
 			case "id":
 				$user = $this->getUser($username, $type);
 
