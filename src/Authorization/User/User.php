@@ -36,7 +36,9 @@ class User extends Nette\Security\User
 	}
 
 	public function logout($clearIdentity = FALSE) {
-		$this->storage->setAction('destroyed');
+		if (!is_null($this->storage->getIdentity())) {
+			$this->storage->setAction('destroyed');
+		}
 
 		parent::logout($clearIdentity);
 	}
