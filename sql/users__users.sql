@@ -24,12 +24,20 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `users__users` (
 `id` int(11) NOT NULL,
-  `status` enum('enable','disable') COLLATE utf8_czech_ci NOT NULL DEFAULT 'enable',
-  `activated` enum('no','yes') COLLATE utf8_czech_ci NOT NULL DEFAULT 'no',
-  `username` varchar(60) COLLATE utf8_czech_ci NOT NULL,
-  `password` text COLLATE utf8_czech_ci NOT NULL,
+	`status`    ENUM('enable', 'disable')
+				COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'enable',
+	`activated` ENUM('no', 'yes')
+				COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'no',
+	`username`  VARCHAR(60)
+				COLLATE utf8mb4_unicode_ci NOT NULL,
+	`password`  TEXT
+				COLLATE utf8mb4_unicode_ci NOT NULL,
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
+)
+	ENGINE = InnoDB
+	AUTO_INCREMENT = 1
+	DEFAULT CHARSET = utf8mb4
+	COLLATE = utf8mb4_unicode_ci;
 
 --
 -- Klíče pro tabulku `users__users`

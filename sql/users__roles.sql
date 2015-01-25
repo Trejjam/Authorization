@@ -25,9 +25,9 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `users__roles` (
 `id` int(11) NOT NULL,
   `parent_id` int(11) DEFAULT NULL,
-  `name` varchar(40) COLLATE utf8_czech_ci NOT NULL,
-  `info` text COLLATE utf8_czech_ci NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
+  `name` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `info` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Klíče pro tabulku `users__roles`

@@ -23,10 +23,10 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `users__user_request` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `hash` varchar(32) COLLATE utf8_czech_ci NOT NULL,
-  `type` enum('activate','lostPassword') COLLATE utf8_czech_ci DEFAULT NULL,
+  `hash` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` enum('activate','lostPassword') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `used` enum('yes','no') NOT NULL DEFAULT 'no'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Klíče pro tabulku `users__user_request`
