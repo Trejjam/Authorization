@@ -314,7 +314,7 @@ class Acl extends Nette\Security\Permission
 		$tableInfo = $this->tables["resource"];
 		unset($tableInfo["table"]);
 
-		$AclResource = new Acl\Role($DBresource, $tableInfo);
+		$AclResource = new Acl\Resource($DBresource, $tableInfo);
 		$this->getTrees()->registerResource($AclResource);
 
 		$this->invalidateCache();
