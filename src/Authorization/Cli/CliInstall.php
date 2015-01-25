@@ -22,7 +22,7 @@ class CliInstall extends Command
 		FILE_USER_ROLE_TABLE = "users__user_role",
 		FILE_USER_REQUEST_TABLE = "users__user_request",
 		FILE_ROLES_DATA_TABLE = "users__roles-data",
-		FILE_IDENTITY_HASH_TABLE = "users__roles-data";
+		FILE_IDENTITY_HASH_TABLE = "users__identity_hash";
 
 
 	/**
