@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `users__user_request` (
   `hash` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` enum('activate','lostPassword') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `used` enum('yes','no') NOT NULL DEFAULT 'no',
-  `timeout` TIMESTAMP NOT NULL
+  `timeout` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
