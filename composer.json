@@ -1,35 +1,42 @@
 {
-  "name": "trejjam/authorization",
-  "description": "Authorization, Authentication, Acl",
-  "keywords": [
-	"nette",
-	"authorization",
-    "authentication",
-    "acl"
-  ],
-  "license": [
-	"MIT"
-  ],
-  "authors": [
-	{
-	  "name": "Jan Trejbal"
+	"name": "trejjam/authorization",
+	"description": "Authorization, Authentication, Acl",
+	"keywords": [
+		"nette",
+		"authorization",
+		"authentication",
+		"acl"
+	],
+	"license": [
+		"MIT"
+	],
+	"authors": [
+		{
+			"name": "Jan Trejbal"
+		}
+	],
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "/var/www/jam/libs/Browser.php"
+		}
+	],
+	"require": {
+		"php": ">=5.3.1",
+		"nette/di": "~2.2",
+		"nette/security": "~2.2",
+		"nette/http": "~2.2",
+		"nette/database": "~2.2",
+		"tracy/tracy": "~2.2",
+		"cbschuld/browser.php": "@dev"
+	},
+	"require-dev": {
+		"nette/tester": "@dev"
+	},
+	"suggest": {
+		"kdyby/console": "to use CLI configurator"
+	},
+	"autoload": {
+		"classmap": ["src/Authorization"]
 	}
-  ],
-  "require": {
-	"php": ">=5.3.1",
-	  "nette/di": "~2.2",
-	  "nette/security": "~2.2",
-	  "nette/http": "~2.2",
-	  "nette/database": "~2.2",
-	  "tracy/tracy": "~2.2"
-  },
-  "require-dev": {
-	"nette/tester": "@dev"
-  },
-  "suggest": {
-    "kdyby/console": "to use CLI configurator"
-  },
-  "autoload": {
-	"classmap": ["src/Authorization"]
-  }
 }

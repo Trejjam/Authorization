@@ -68,6 +68,9 @@ authorization:
 		name    : authorization
 		timeout : 10 minutes    
 	debugger:false #not implemented yet
+	
+services:
+	- Browser
 ```
 Config
 ------
