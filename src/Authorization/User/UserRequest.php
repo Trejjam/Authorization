@@ -21,6 +21,10 @@ class UserRequest
 	 * @var array
 	 */
 	protected $tables;
+	/**
+	 * @var int
+	 */
+	protected $sqlTime;
 
 	public function __construct(Nette\Database\Context $database) {
 		$this->database = $database;
@@ -36,39 +40,48 @@ class UserRequest
 		return in_array($type, $this->tables['userRequest']['type']['option']);
 	}
 
-	public function generateHash($userId, $type) {
+	public function generateHash($userId, $type, $timeout = NULL) {
 		if (!$this->isTypeValid($type)) {
-			throw new UserRequestException("Type '$type' is not valid");
+			throw new UserRequestException("Type '$type' is not valid or registered");
 		}
 
-		do {
-			$hash = Nette\Utils\Random::generate($this->tables['userRequest']['hash']['length'], '0-9A-Z');
-		} while($this->getTable()->where([
-			$this->tables['userRequest']['hash']['name'] => $hash,
-		])->fetch());
+		$hash = Nette\Utils\Random::generate($this->tables['userRequest']['hash']['length'], '0-9A-Z');
+		if (is_null($timeout)) {
+			$timeout = $this->tables['userRequest']['timeout']['default'];
+		}
 
-		$this->getTable()->insert([
-			$this->tables['userRequest']['userId']       => $userId,
-			$this->tables['userRequest']['hash']['name'] => $hash,
-			$this->tables['userRequest']['type']['name'] => $type,
+		$insertion = $this->getTable()->insert([
+			$this->tables['userRequest']['userId']          => $userId,
+			$this->tables['userRequest']['hash']['name']    => Nette\Security\Passwords::hash($hash),
+			$this->tables['userRequest']['type']['name']    => $type,
+			$this->tables['userRequest']['timeout']['name'] => new Nette\Database\SqlLiteral('NOW() + INTERVAL ' . $timeout),
 		]);
 
-		return $hash;
+		return [$insertion->id, $hash];
 	}
 	/**
 	 * @param int    $userId
+	 * @param int    $requestId
 	 * @param string $hash
 	 * @param bool   $invalidateHash
 	 * @return bool|string
 	 */
-	public function getType($userId, $hash, $invalidateHash = TRUE) {
+	public function getType($userId, $requestId, $hash, $invalidateHash = TRUE) {
 		if ($row = $this->getTable()->where([
-			$this->tables['userRequest']['userId']       => $userId,
-			$this->tables['userRequest']['hash']['name'] => $hash,
+			$this->tables['userRequest']['userId'] => $userId,
+			$this->tables['userRequest']['id']     => $requestId,
 		])->fetch()
 		) {
+			if (!Nette\Security\Passwords::verify($hash, $row->{$this->tables['userRequest']['hash']['name']})) {
+				throw new UserRequestException('Hash is corrupted', UserRequestException::CORRUPTED_HASH);
+			}
+
 			if ($row->{$this->tables['userRequest']['used']['name']} == $this->tables['userRequest']['used']['positive']) {
-				return TRUE;
+				throw new UserRequestException('Hash was used', UserRequestException::USED_HASH);
+			}
+
+			if ($row->{$this->tables['userRequest']['timeout']['name']} < $this->getSqlTime()) {
+				throw new UserRequestException('Hash timeout', UserRequestException::HASH_TIMEOUT);
 			}
 
 			if ($invalidateHash) {
@@ -80,6 +93,16 @@ class UserRequest
 			return $row->{$this->tables['userRequest']['type']['name']};
 		}
 
-		return FALSE;
+		throw new UserRequestException("Permission denied to requestId '$requestId' for user '$userId'", UserRequestException::PERMISSION_DENIED);
+	}
+
+	private function getSqlTime() {
+		if (isset($this->sqlTime)) {
+			return $this->sqlTime;
+		}
+
+		$q = $this->database->query('SELECT NOW() as now;');
+
+		return $this->sqlTime = $q->fetch()->now;
 	}
 }

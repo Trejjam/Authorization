@@ -38,5 +38,10 @@
 	},
 	"autoload": {
 		"classmap": ["src/Authorization"]
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "0.7-dev"
+		}
 	}
 }

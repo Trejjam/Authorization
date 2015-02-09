@@ -23,9 +23,10 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `users__user_request` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `hash` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hash` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` enum('activate','lostPassword') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `used` enum('yes','no') NOT NULL DEFAULT 'no'
+  `used` enum('yes','no') NOT NULL DEFAULT 'no',
+  `timeout` TIMESTAMP NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --

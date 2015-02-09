@@ -39,7 +39,11 @@ class UserConfigurationException extends \LogicException
 
 class UserRequestException extends \LogicException
 {
-
+	const
+		PERMISSION_DENIED='1',
+		CORRUPTED_HASH='2',
+		USED_HASH='4',
+		HASH_TIMEOUT='8';
 }
 
 class UserStorageException extends \LogicException

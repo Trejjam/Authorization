@@ -56,23 +56,27 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 				'resourceAction' => 'action', //default ALL
 			],
 			'userRequest'  => [
-				'table'  => 'users__user_request',
-				'id'     => 'id',
-				'userId' => 'user_id',
-				'hash'   => [
+				'table'   => 'users__user_request',
+				'id'      => 'id',
+				'userId'  => 'user_id',
+				'hash'    => [
 					'name'   => 'hash',
 					'length' => 10,
 				],
-				'type'   => [
+				'type'    => [
 					'name'   => 'type',
 					'option' => [
 						'activate',
 						'lostPassword',
 					]
 				],
-				'used'   => [
+				'used'    => [
 					'name'     => 'used',
 					'positive' => 'yes',
+				],
+				'timeout' => [
+					'name'    => 'timeout',
+					'default' => '1 HOUR',
 				],
 			],
 			'identityHash' => [

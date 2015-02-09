@@ -35,15 +35,17 @@ class CliInstall extends Command
 			 ->setDescription('Install default tables');
 	}
 	protected function execute(InputInterface $input, OutputInterface $output) {
-		$this->database->query($this->getFile(self::FILE_USERS_TABLE));
-		$this->database->query($this->getFile(self::FILE_ROLES_TABLE));
-		$this->database->query($this->getFile(self::FILE_RESOURCES_TABLE));
-		$this->database->query($this->getFile(self::FILE_USER_ROLE_TABLE));
-		$this->database->query($this->getFile(self::FILE_USER_REQUEST_TABLE));
-		$this->database->query($this->getFile(self::FILE_ROLES_DATA_TABLE));
-		$this->database->query($this->getFile(self::FILE_IDENTITY_HASH_TABLE));
+		$connection = $this->database->getConnection();
+
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_USERS_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_ROLES_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_RESOURCES_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_USER_ROLE_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_USER_REQUEST_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_ROLES_DATA_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_IDENTITY_HASH_TABLE));
 	}
 	protected function getFile($file) {
-		return file_get_contents(__DIR__ . "/../../../sql/" . $file . ".sql");
+		return __DIR__ . "/../../../sql/" . $file . ".sql";
 	}
 }
