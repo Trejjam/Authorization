@@ -11,10 +11,6 @@ use Nette,
  */
 class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 {
-	const
-		NOT_ENABLE = 10,
-		NOT_ACTIVATED = 11;
-
 	/**
 	 * @var Nette\Database\Context
 	 */
@@ -44,8 +40,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	/**
 	 * Performs an authentication.
 	 * @param array $credentials
-	 * @return Nette\Security\Identity
-	 * @throws Nette\Security\AuthenticationException
+	 * @return Nette\Security\Identity|Nette\Security\IIdentity
 	 */
 	public function authenticate(array $credentials) {
 		list($username, $password) = $credentials;
@@ -55,11 +50,11 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 							  ->fetch();
 
 		if (!$row) {
-			throw new Nette\Security\AuthenticationException('The username is incorrect.', self::IDENTITY_NOT_FOUND);
+			throw new UserManagerException('The username is incorrect.', UserManagerException::NOT_EXIST_USERNAME);
 
 		}
 		elseif (!is_null($password) && !Passwords::verify($password, $row[$this->tables["users"]["password"]])) {
-			throw new Nette\Security\AuthenticationException('The password is incorrect.', self::INVALID_CREDENTIAL);
+			throw new UserManagerException('The password is incorrect.', UserManagerException::INVALID_CREDENTIAL);
 
 		}
 		elseif (!is_null($password) && Passwords::needsRehash($row[$this->tables["users"]["password"]])) {
@@ -69,10 +64,10 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		}
 
 		if ($row[$this->tables["users"]["status"]["name"]] != $this->tables["users"]["status"]["accept"]) {
-			throw new Nette\Security\AuthenticationException('The user is not enable.', self::NOT_ENABLE);
+			throw new UserManagerException('The user is not enable.', UserManagerException::NOT_ENABLE);
 		}
 		if ($row[$this->tables["users"]["activated"]["name"]] != $this->tables["users"]["activated"]["yes"]) {
-			throw new Nette\Security\AuthenticationException('The user is not activated.', self::NOT_ACTIVATED);
+			throw new UserManagerException('The user is not activated.', UserManagerException::NOT_ACTIVATED);
 		}
 
 		$arr = $row->toArray();
@@ -90,19 +85,19 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	 */
 	public function isUsernameValid($username) {
 		if (strlen($username) > $this->tables["users"]["username"]["length"]) {
-			throw new UserManagerException("The username is too long");
+			throw new UserManagerException("The username is too long", UserManagerException::LONG_USERNAME);
 		}
 
 		switch ($this->tables["users"]["username"]["match"]) {
 			case "email":
 				if (!Nette\Utils\Validators::isEmail($username)) {
-					throw new UserManagerException("The username is not an email");
+					throw new UserManagerException("The username is not an email", UserManagerException::NOT_VALID_USERNAME);
 				}
 
 				break;
 			default:
 				if (!preg_match($this->tables["users"]["username"]["match"], $username)) {
-					throw new UserManagerException("The username is not match regex " . $this->tables["users"]["username"]["match"]);
+					throw new UserManagerException("The username is not match regex " . $this->tables["users"]["username"]["match"], UserManagerException::NOT_VALID_USERNAME);
 				}
 		}
 
@@ -124,7 +119,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			return $user[$this->tables["users"]["id"]];
 		}
 		else {
-			throw new UserManagerException("The user is not exist");
+			throw new UserManagerException("The user is not exist", UserManagerException::NOT_EXIST_USERNAME);
 		}
 	}
 	/**
@@ -146,14 +141,14 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 									   ->where([$this->tables["users"]["id"] => $username])->fetch();
 				break;
 			default:
-				throw new UserManagerException("Unrecognized type");
+				throw new UserManagerException("Unrecognized type", UserManagerException::UNRECOGNIZED_TYPE);
 		}
 
 		if ($user) {
 			return $user;
 		}
 		else {
-			throw new UserManagerException("The user is not exist");
+			throw new UserManagerException("The user is not exist", UserManagerException::NOT_EXIST_USERNAME);
 		}
 	}
 
@@ -174,7 +169,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 			]);
 		}
 		else {
-			throw new UserManagerException("The user $username:$type not exist");
+			throw new UserManagerException("The user $username:$type not exist", UserManagerException::NOT_EXIST_USERNAME);
 		}
 	}
 	/**
@@ -286,7 +281,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 
 				break;
 			default:
-				throw new UserManagerException("Unrecognized type");
+				throw new UserManagerException("Unrecognized type", UserManagerException::UNRECOGNIZED_TYPE);
 		}
 
 		$usersTable = $this->tables["users"];

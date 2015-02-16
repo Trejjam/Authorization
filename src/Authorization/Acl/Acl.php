@@ -133,7 +133,7 @@ class Acl extends Nette\Security\Permission
 				$this->database->table($this->tables["userRoles"]["table"])->insert($roleArr);
 			}
 			else {
-				throw new RoleException("The user is already member of the role: " . $roleName);
+				throw new RoleException("The user is already member of the role: " . $roleName, RoleException::ALREADY_IN_ROLE);
 			}
 		}
 	}
@@ -169,7 +169,7 @@ class Acl extends Nette\Security\Permission
 		if (!is_null($parent)) {
 			$parentRole = $this->getRoleByName($parent);
 			if (is_null($parentRole)) {
-				throw new RoleException("Role " . $parent . " not exist");
+				throw new RoleException("Role " . $parent . " not exist", RoleException::NOT_EXIST);
 			}
 
 			$dbArr[$this->tables["roles"]["parentId"]] = $parentRole->getId();
@@ -177,7 +177,7 @@ class Acl extends Nette\Security\Permission
 
 		$roleDb = $this->database->table($this->tables["roles"]["table"])->where($dbArr)->fetch();
 		if ($roleDb) {
-			throw new RoleException("Role " . $role . " already exist");
+			throw new RoleException("Role " . $role . " already exist", RoleException::ALREADY_EXIST);
 		}
 
 		if (is_string($this->tables["roles"]["info"])) {
@@ -209,19 +209,19 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
 		}
 
 		if (!is_null($parent)) {
 			$aclParent = $this->getRoleByName($parent);
 			if (is_null($aclParent)) {
-				throw new RoleException("Role " . $parent . " not exist");
+				throw new RoleException("Role " . $parent . " not exist", RoleException::NOT_EXIST);
 			}
 
 			$dbArr[$this->tables["roles"]["parentId"]] = $aclParent->getId();
 
 			if ($this->findCircle($aclRole, $aclParent)) {
-				throw new RoleException("Connecting role ($role) to parent ($parent) forming a circle");
+				throw new RoleException("Connecting role ($role) to parent ($parent) forming a circle", RoleException::CREATE_CIRCLE);
 			}
 		}
 
@@ -241,7 +241,7 @@ class Acl extends Nette\Security\Permission
 		$aclRole = $this->getRoleByName($role);
 
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
 		}
 
 		if ($force) {
@@ -299,14 +299,14 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
 		}
 
 		$dbArr[$this->tables["resource"]["roleId"]] = $aclRole->getId();
 
 		$resourceDb = $this->database->table($this->tables["resource"]["table"])->where($dbArr)->fetch();
 		if ($resourceDb) {
-			throw new ResourceException("Resource " . $resource . " already exist");
+			throw new ResourceException("Resource " . $resource . " already exist", ResourceException::ALREADY_EXIST);
 		}
 
 		$DBresource = $this->database->table($this->tables["resource"]["table"])->insert($dbArr);
@@ -333,7 +333,7 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist");
+			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
 		}
 
 		$dbArr[$this->tables["resource"]["roleId"]] = $aclRole->getId();
@@ -367,7 +367,7 @@ class Acl extends Nette\Security\Permission
 			return $resources[$id];
 		}
 		else {
-			throw new ResourceException("Resource not exist");
+			throw new ResourceException("Resource not exist", ResourceException::NOT_EXIST);
 		}
 	}
 	protected function getResource($resource, $resourceAction = NULL) {
@@ -382,7 +382,7 @@ class Acl extends Nette\Security\Permission
 			return $resourceDb;
 		}
 		else {
-			throw new ResourceException("Resource $resource:$resourceAction not exist");
+			throw new ResourceException("Resource $resource:$resourceAction not exist", ResourceException::NOT_EXIST);
 		}
 	}
 

@@ -104,7 +104,9 @@ class Role
 	 * @throws Trejjam\Authorization\UserConfigurationException
 	 */
 	public function getInfo() {
-		if ($this->info === FALSE) throw new Trejjam\Authorization\UserConfigurationException("Field 'info' was disabled in configuration");
+		if ($this->info === FALSE) {
+			throw new Trejjam\Authorization\UserConfigurationException("Field 'info' was disabled in configuration", Trejjam\Authorization\UserConfigurationException::INFO_IS_DISABLED);
+		}
 
 		return $this->info;
 	}
