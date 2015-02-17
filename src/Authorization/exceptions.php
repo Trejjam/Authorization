@@ -12,6 +12,12 @@ namespace Trejjam\Authorization;
 use Nette,
 	Trejjam;
 
+class TableNotFoundException extends \Exception
+{
+	const
+		TABLE_NOT_FOUND = 1;
+}
+
 class RoleException extends \LogicException
 {
 	const

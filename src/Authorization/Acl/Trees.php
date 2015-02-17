@@ -68,7 +68,7 @@ class Trees
 	}
 	protected function createResourceTree(Nette\Database\Context $database, array $tables) {
 		if (!$database->query("SHOW TABLES LIKE '" . $tables["resource"]["table"] . "'")->getRowCount()) {
-			throw new Trejjam\Authorization\TableNotFoundException("Table " . $tables["resource"]["table"] . " not exist");
+			throw new Trejjam\Authorization\TableNotFoundException("Table " . $tables["resource"]["table"] . " not exist", Trejjam\Authorization\TableNotFoundException::TABLE_NOT_FOUND);
 		}
 		foreach ($database->table($tables["resource"]["table"]) as $v) {
 			$tableInfo = $tables["resource"];
