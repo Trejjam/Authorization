@@ -52,7 +52,12 @@ class User extends Nette\Security\User
 
 			switch ($action) {
 				case 'reload':
-					$this->login($this->getId(), NULL);
+					try {
+						$this->login($this->getId(), NULL);
+					}
+					catch (UserManagerException $e) {
+						$this->logout();
+					}
 
 					break;
 				case 'logout':
