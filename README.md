@@ -33,10 +33,16 @@ authorization:
 			id	    : id #column name
 			status    : 
 				name   : status #column name
-				accept : enable            
+				accept : enable 
+				options:
+					enable
+					disable
 			activated : 
-				name : activated #column name
-				yes  : yes            
+				name  : activated #column name
+				accept: yes    
+				options:
+					yes
+					no
 			username  : 
 				name   : username #column name
 				match  : '/^[a-zA-Z_]+$/' #email is special value (validate by Nette\Utils\Validators:isEmail)

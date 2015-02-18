@@ -18,12 +18,20 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 				'table'     => 'users__users',
 				'id'        => 'id',
 				'status'    => [
-					'name'   => 'status',
-					'accept' => 'enable',
+					'name'    => 'status',
+					'accept'  => 'enable',
+					'options' => [
+						'enable',
+						'disable',
+					],
 				],
 				'activated' => [
-					'name' => 'activated',
-					'yes'  => 'yes',
+					'name'    => 'activated',
+					'accept'  => 'yes',
+					'options' => [
+						'yes',
+						'no',
+					],
 				],
 				'username'  => [
 					'name'   => 'username',

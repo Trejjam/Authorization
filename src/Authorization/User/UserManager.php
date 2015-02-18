@@ -66,7 +66,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		if ($row[$this->tables["users"]["status"]["name"]] != $this->tables["users"]["status"]["accept"]) {
 			throw new UserManagerException('The user is not enable.', UserManagerException::NOT_ENABLE);
 		}
-		if ($row[$this->tables["users"]["activated"]["name"]] != $this->tables["users"]["activated"]["yes"]) {
+		if ($row[$this->tables["users"]["activated"]["name"]] != $this->tables["users"]["activated"]["accept"]) {
 			throw new UserManagerException('The user is not activated.', UserManagerException::NOT_ACTIVATED);
 		}
 
@@ -224,6 +224,24 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		]);
 	}
 	/**
+	 * @param        $username
+	 * @param string $type
+	 * @return string
+	 * @throws UserManagerException
+	 */
+	public function getStatus($username, $type = 'username') {
+		$user = $this->getUser($username, $type);
+
+		return $user->{$this->tables["users"]["status"]["name"]};
+	}
+	/**
+	 * @return array
+	 */
+	public function getStatusOptions() {
+		return $this->tables["users"]["status"]['options'];
+	}
+
+	/**
 	 * @param string $username
 	 * @param string $activated
 	 * @param string $type [username|id]
@@ -231,7 +249,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	 */
 	public function setActivated($username, $activated = NULL, $type = "username") {
 		if (is_null($activated)) {
-			$activated = $this->tables["users"]["activated"]["yes"];
+			$activated = $this->tables["users"]["activated"]["accept"];
 		}
 
 		$user = $this->getUser($username, $type);
@@ -239,6 +257,23 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		$user->update([
 			$this->tables["users"]["activated"]["name"] => $activated,
 		]);
+	}
+	/**
+	 * @param        $username
+	 * @param string $type
+	 * @return string
+	 * @throws UserManagerException
+	 */
+	public function getActivated($username, $type = 'username') {
+		$user = $this->getUser($username, $type);
+
+		return $user->{$this->tables["users"]["activated"]["name"]};
+	}
+	/**
+	 * @return array
+	 */
+	public function getActivatedOptions() {
+		return $this->tables["users"]["activated"]['options'];
 	}
 
 	/**
@@ -254,6 +289,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 
 		return $out;
 	}
+
 	/**
 	 * @param string $username
 	 * @param string $type [auto|activeRow|username|id]
