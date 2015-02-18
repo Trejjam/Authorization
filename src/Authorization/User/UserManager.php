@@ -366,7 +366,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	 * @param string $hash
 	 * @param string $action
 	 */
-	public function setAction($hash, $action) {
+	public function setIdentityAction($hash, $action) {
 		if (!in_array($action, $this->tables['identityHash']['action']['option'])) {
 			throw new UserManagerException("Action '$action' is not enabled.", UserManagerException::ACTION_NOT_ENABLED);
 		}
