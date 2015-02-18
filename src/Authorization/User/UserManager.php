@@ -225,7 +225,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	}
 	/**
 	 * @param        $username
-	 * @param string $type
+	 * @param string $type [username|id]
 	 * @return string
 	 * @throws UserManagerException
 	 */
@@ -260,7 +260,7 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	}
 	/**
 	 * @param        $username
-	 * @param string $type
+	 * @param string $type [username|id]
 	 * @return string
 	 * @throws UserManagerException
 	 */
@@ -335,5 +335,46 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 		}
 
 		return $out;
+	}
+
+	/**
+	 * @param        $username
+	 * @param bool   $all
+	 * @param string $type [username|id]
+	 * @return array
+	 */
+	public function getIdentityHash($username, $all = FALSE, $type = 'username') {
+		$user = $this->getUser($username, $type);
+
+		$out = [];
+
+		$where = [
+			$this->tables['identityHash']['userId'] => $user->{$this->tables["users"]["id"]},
+		];
+
+		if (!$all) {
+			$where[$this->tables['identityHash']['action']['name']] = ['none', 'reload'];
+		}
+
+		foreach ($this->database->table($this->tables['identityHash']['table'])->where($where) as $v) {
+			$out[$v->{$this->tables['identityHash']['hash']}] = $v->{$this->tables['identityHash']['ip']};
+		}
+
+		return $out;
+	}
+	/**
+	 * @param string $hash
+	 * @param string $action
+	 */
+	public function setAction($hash, $action) {
+		if (!in_array($action, $this->tables['identityHash']['action']['option'])) {
+			throw new UserManagerException("Action '$action' is not enabled.", UserManagerException::ACTION_NOT_ENABLED);
+		}
+
+		$this->database->table($this->tables['identityHash']['table'])->where([
+			$this->tables['identityHash']['hash'] => $hash,
+		])->update([
+			$this->tables['identityHash']['action']['name'] => $action,
+		]);
 	}
 }

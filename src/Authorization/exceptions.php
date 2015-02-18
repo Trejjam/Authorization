@@ -43,7 +43,8 @@ class UserManagerException extends \LogicException
 		NOT_ACTIVATED = 8,
 		LONG_USERNAME = 16,
 		NOT_VALID_USERNAME = 32,
-		UNRECOGNIZED_TYPE = 64;
+		UNRECOGNIZED_TYPE = 64,
+		ACTION_NOT_ENABLED = 128;
 }
 
 class UserConfigurationException extends \LogicException
@@ -59,4 +60,11 @@ class UserRequestException extends \LogicException
 		CORRUPTED_HASH = 2,
 		USED_HASH = 4,
 		HASH_TIMEOUT = 8;
+}
+
+class UserStorageException extends \LogicException
+{
+	const
+		IDENTITY_NOT_EXIST = 1,
+		ACTION_NOT_ENABLED = 2;
 }

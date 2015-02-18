@@ -26,15 +26,20 @@ class UserStorage extends Nette\Http\UserStorage
 	 * @var Nette\Database\Context
 	 */
 	protected $database;
+	/**
+	 * @var Nette\Http\Request
+	 */
+	protected $request;
 
 	protected $tables;
 
-	public function  __construct(Nette\Http\Session $sessionHandler, \Browser $browser, Nette\Database\Context $database) {
+	public function  __construct(Nette\Http\Session $sessionHandler, \Browser $browser, Nette\Database\Context $database, Nette\Http\Request $request) {
 		parent::__construct($sessionHandler);
 
 		$this->sessionHandler = $sessionHandler;
 		$this->browser = $browser;
 		$this->database = $database;
+		$this->request = $request;
 	}
 
 	public function setTables(array $tables) {
@@ -87,18 +92,22 @@ class UserStorage extends Nette\Http\UserStorage
 		$this->getIdentityHashTable()->insert([
 			$this->tables['identityHash']['userId'] => $userId,
 			$this->tables['identityHash']['hash']   => $hash,
+			$this->tables['identityHash']['ip'] => $this->request->getRemoteAddress(),
 		]);
 
 		return $hash;
 	}
 	public function getAction() {
 		if (is_null($identity = $this->getIdentity())) {
-			throw new UserStorageException("Identity not exist");
+			throw new UserStorageException("Identity not exist", UserStorageException::IDENTITY_NOT_EXIST);
 		}
 
 		$hash = $identity->hash;
 
 		$row = $this->getIdentityHashTable()->where([$this->tables['identityHash']['hash'] => $hash])->fetch();
+		$row->update([
+			$this->tables['identityHash']['ip'] => $this->request->getRemoteAddress(),
+		]);
 
 		if ($row) {
 			return $row->{$this->tables['identityHash']['action']['name']};
@@ -108,11 +117,11 @@ class UserStorage extends Nette\Http\UserStorage
 	}
 	public function setAction($action) {
 		if (!in_array($action, $this->tables['identityHash']['action']['option'])) {
-			throw new UserStorageException("Action '$action' is not enabled.");
+			throw new UserStorageException("Action '$action' is not enabled.", UserStorageException::ACTION_NOT_ENABLED);
 		}
 
 		if (is_null($identity = $this->getIdentity())) {
-			throw new UserStorageException("Identity not exist");
+			throw new UserStorageException("Identity not exist", UserStorageException::IDENTITY_NOT_EXIST);
 		}
 
 		$hash = $identity->hash;

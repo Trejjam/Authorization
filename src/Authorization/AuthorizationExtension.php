@@ -92,6 +92,7 @@ class AuthorizationExtension extends Nette\DI\CompilerExtension
 				'id'     => 'id',
 				'userId' => 'user_id',
 				'hash'   => 'hash',
+				'ip' => 'ip',
 				'action' => [
 					'name'   => 'action',
 					'option' => [

@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS `users__identity_hash` (
 `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `hash` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+	`ip` VARCHAR(50)
+		 COLLATE utf8mb4_unicode_ci NOT NULL,
   `action` enum('none','reload','logout','destroyed') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'none'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
