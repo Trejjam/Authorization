@@ -277,17 +277,54 @@ class UserManager extends Nette\Object implements Nette\Security\IAuthenticator
 	}
 
 	/**
+	 * @param array $sort
+	 * @param array $filter
+	 * @param null  $limit
+	 * @param null  $offset
 	 * @return \stdClass[]
-	 * @throws UserManagerException
 	 */
-	public function getUsersList() {
+	public function getUsersList(array $sort = NULL, array $filter = NULL, $limit = NULL, $offset = NULL) {
 		$out = [];
 
-		foreach ($this->database->table($this->tables["users"]["table"]) as $k => $v) {
+		$query = $this->database->table($this->tables["users"]["table"]);
+
+		if (!is_null($filter)) {
+			foreach ($filter as $k => $v) {
+				$query = $query->where([
+					$k . ' LIKE' => '%' . $v . '%',
+				]);
+			}
+		}
+
+		if (!is_null($sort)) {
+			foreach ($sort as $k => $v) {
+				$query = $query->order($k . ' ' . strtoupper($v));
+			}
+		}
+
+		if (!is_null($limit)) {
+			$query = $query->limit($limit, $offset);
+		}
+
+		foreach ($query as $k => $v) {
 			$out[$k] = $this->getUserInfo($v);
 		}
 
 		return $out;
+	}
+
+	public function getUserCount(array $filter = NULL) {
+		$query = $this->database->table($this->tables["users"]["table"])->select('COUNT(*) count');
+
+		if (!is_null($filter)) {
+			foreach ($filter as $k => $v) {
+				$query = $query->where([
+					$k . ' LIKE' => '%' . $v . '%',
+				]);
+			}
+		}
+
+		return $query->fetch()->count;
 	}
 
 	/**
