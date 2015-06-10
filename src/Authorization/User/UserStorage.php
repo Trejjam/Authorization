@@ -105,11 +105,12 @@ class UserStorage extends Nette\Http\UserStorage
 		$hash = $identity->hash;
 
 		$row = $this->getIdentityHashTable()->where([$this->tables['identityHash']['hash'] => $hash])->fetch();
-		$row->update([
-			$this->tables['identityHash']['ip'] => $this->request->getRemoteAddress(),
-		]);
 
 		if ($row) {
+			$row->update([
+				$this->tables['identityHash']['ip'] => $this->request->getRemoteAddress(),
+			]);
+
 			return $row->{$this->tables['identityHash']['action']['name']};
 		}
 
