@@ -33,11 +33,11 @@ class UserStorage extends Nette\Http\UserStorage
 
 	protected $tables;
 
-	public function  __construct(Nette\Http\Session $sessionHandler, \Browser $browser, Nette\Database\Context $database, Nette\Http\Request $request) {
+	public function  __construct(Nette\Http\Session $sessionHandler, Nette\Database\Context $database, Nette\Http\Request $request) {
 		parent::__construct($sessionHandler);
 
 		$this->sessionHandler = $sessionHandler;
-		$this->browser = $browser;
+		//$this->browser = $browser;
 		$this->database = $database;
 		$this->request = $request;
 	}
@@ -54,8 +54,8 @@ class UserStorage extends Nette\Http\UserStorage
 	public function setIdentity(Nette\Security\IIdentity $identity = NULL) {
 		if (!is_null($identity)) {
 
-			$identity->browser = $this->browser->getBrowser();
-			$identity->browserVersion = $this->browser->getVersion();
+			//$identity->browser = $this->browser->getBrowser();
+			//$identity->browserVersion = $this->browser->getVersion();
 
 			$identity->hash = $this->createHash($identity->getId());
 		}
@@ -70,12 +70,12 @@ class UserStorage extends Nette\Http\UserStorage
 		$ret = parent::getSessionSection($need);
 
 		if (!is_null($ret)) {
-			if ($ret->authenticated && $ret->identity->browser !== $this->browser->getBrowser() && $ret->identity->browserVersion !== $this->browser->getVersion()) {
+			/*if ($ret->authenticated && $ret->identity->browser !== $this->browser->getBrowser() && $ret->identity->browserVersion !== $this->browser->getVersion()) {
 				$ret->authenticated = FALSE;
 				$this->sessionHandler->regenerateId();
 				$ret->reason = self::MANUAL;
 				$ret->authTime = NULL;
-			}
+			}*/
 		}
 
 		return $ret;
