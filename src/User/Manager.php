@@ -361,7 +361,12 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		foreach ($this->identityHash->getUserHashes($user, $all ? [
 			IdentityHash::ACTION_NONE,
 			IdentityHash::ACTION_RELOAD,
-		] : []) as $v) {
+			IdentityHash::ACTION_DESTROYED,
+			IdentityHash::ACTION_LOGOUT,
+		] : [
+			IdentityHash::ACTION_NONE,
+			IdentityHash::ACTION_RELOAD,
+		]) as $v) {
 			$out[$v->hash] = $v->ip;
 		}
 

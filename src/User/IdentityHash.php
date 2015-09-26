@@ -74,7 +74,7 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 	public function getUserHashes($user, array $actions = []) {
 		return $this->getRelatedList($user, $this->tables['identityHash']['userId'], NULL, [
 			static::STRICT => [
-				$this->tables['identityHash']['action']['name'] => $actions,
+				$this->tables['identityHash']['action'] => $actions,
 			]
 		]);
 	}
@@ -134,5 +134,23 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 		$action = reset($hashes);
 
 		return $action->action;
+	}
+
+	public function setHashAction($hash, $action) {
+		if (!in_array($action, [
+			static::ACTION_NONE,
+			static::ACTION_RELOAD,
+			static::ACTION_LOGOUT,
+			static::ACTION_DESTROYED,
+		])
+		) {
+			throw new Trejjam\Authorization\UserManagerException("Action '$action' is not enabled.", Trejjam\Authorization\UserManagerException::ACTION_NOT_ENABLED);
+		}
+
+		$this->getTable()->where([
+			$this->tables['identityHash']['hash'] => $hash,
+		])->update([
+			$this->tables['identityHash']['action'] => $action,
+		]);
 	}
 }
