@@ -10,7 +10,8 @@ namespace Trejjam\Authorization\User;
 
 
 use Nette,
-	Trejjam;
+	Trejjam,
+	Sinergi;
 
 class Storage extends Nette\Http\UserStorage
 {
@@ -26,14 +27,18 @@ class Storage extends Nette\Http\UserStorage
 	 * @var Nette\Http\Request
 	 */
 	protected $request;
+	/**
+	 * @var Sinergi\BrowserDetector\Browser
+	 */
+	protected $browser;
 
 	protected $tables;
 
-	public function  __construct(Nette\Http\Session $sessionHandler, IdentityHash $identityHash, Nette\Http\Request $request) {
+	public function  __construct(Nette\Http\Session $sessionHandler, IdentityHash $identityHash, Nette\Http\Request $request, Sinergi\BrowserDetector\Browser $browser) {
 		parent::__construct($sessionHandler);
 
 		$this->sessionHandler = $sessionHandler;
-		//$this->browser = $browser;
+		$this->browser = $browser;
 		$this->identityHash = $identityHash;
 		$this->request = $request;
 	}
@@ -46,8 +51,8 @@ class Storage extends Nette\Http\UserStorage
 	public function setIdentity(Nette\Security\IIdentity $identity = NULL) {
 		if (!is_null($identity)) {
 
-			//$identity->browser = $this->browser->getBrowser();
-			//$identity->browserVersion = $this->browser->getVersion();
+			$identity->browser = $this->browser->getName();
+			$identity->browserVersion = $this->browser->getVersion();
 
 			$identity->hash = $this->identityHash->createIdentityHash($identity->getId(), $this->request->getRemoteAddress());
 		}
@@ -63,12 +68,12 @@ class Storage extends Nette\Http\UserStorage
 		$ret = parent::getSessionSection($need);
 
 		if (!is_null($ret)) {
-			/*if ($ret->authenticated && $ret->identity->browser !== $this->browser->getBrowser() && $ret->identity->browserVersion !== $this->browser->getVersion()) {
+			if ($ret->authenticated && $ret->identity->browser !== $this->browser->getName() && $ret->identity->browserVersion !== $this->browser->getVersion()) {
 				$ret->authenticated = FALSE;
 				$this->sessionHandler->regenerateId();
 				$ret->reason = static::MANUAL;
 				$ret->authTime = NULL;
-			}*/
+			}
 		}
 
 		return $ret;

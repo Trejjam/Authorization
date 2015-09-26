@@ -25,6 +25,9 @@
 		"nette/security": "^2.3",
 		"nette/http": "^2.3",
 		"nette/database": "^2.3",
+
+		"sinergi/browser-detector": "^5.0",
+
 		"trejjam/base-extension": "^0.5",
 		"trejjam/utils": "^1.2"
 	},
