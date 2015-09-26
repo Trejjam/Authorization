@@ -6,7 +6,7 @@
  * Time: 2:25
  */
 
-namespace Trejjam\Authorization;
+namespace Trejjam\Authorization\Cli;
 
 use Symfony\Component\Console\Input\InputArgument,
 	Symfony\Component\Console\Input\InputOption,
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputArgument,
 	Symfony\Component\Console\Output\OutputInterface,
 	Nette;
 
-class CliRole extends CliHelper
+class Role extends Helper
 {
 	protected function configure() {
 		$this->setName('Auth:role')

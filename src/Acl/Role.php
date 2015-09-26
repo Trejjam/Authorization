@@ -53,6 +53,7 @@ class Role
 	protected function connectToChild(Role $role) {
 		$this->child[$role->getId()] = $role;
 	}
+
 	/**
 	 * @param Resource $resource
 	 */
@@ -60,7 +61,8 @@ class Role
 		$this->resources[$resource->getId()] = $resource;
 	}
 	/**
-	 * @param array $role
+	 * @param Role[]     $role
+	 * @param Resource[] $resource
 	 */
 	public function fillArrays(array &$role, array &$resource) {
 		$role[$this->getId()] = $this;

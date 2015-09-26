@@ -15,7 +15,7 @@ Installation
 The best way to install Trejjam/Authorization is using  [Composer](http://getcomposer.org/):
 
 ```sh
-$ composer require trejjam/authorization:v0.8
+$ composer require trejjam/authorization:v0.10
 ```
 
 Configuration
@@ -24,7 +24,7 @@ Configuration
 .neon
 ```yml
 extensions:
-	authorization: Trejjam\DI\AuthorizationExtension
+	authorization: Trejjam\Authorization\DI\AuthorizationExtension
 
 authorization:
 	tables:
@@ -32,25 +32,25 @@ authorization:
 			table	 : users__users
 			id	    : id #column name
 			status    : 
-				name   : status #column name
 				accept : enable 
 				options:
 					enable
 					disable
 			activated : 
-				name  : activated #column name
 				accept: yes    
 				options:
 					yes
 					no
 			username  : 
-				name   : username #column name
 				match  : '/^[a-zA-Z_]+$/' #email is special value (validate by Nette\Utils\Validators:isEmail)
-				length : 60            
-			password  : password #column name
-			timestamp : 
-				created   : date_created #column name
-				edited    : date_edited #column name
+				length : 60
+			items:
+                - id
+                - status
+                - activated
+                - username
+                - password
+                dateCreated: date_created
 		roles:
 			table    : users__roles
 			id       : id #column name

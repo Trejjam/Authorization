@@ -15,32 +15,39 @@
 			"name": "Jan Trejbal"
 		}
 	],
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "/var/www/jam/libs/Browser.php"
-		}
-	],
+	"support": {
+		"email": "jan.trejbal@gmail.com",
+		"issues": "https://github.com/Trejjam/Authorization/issues"
+	},
 	"require": {
-		"php": ">=5.3.1",
-		"nette/di": "~2.2",
-		"nette/security": "~2.2",
-		"nette/http": "~2.2",
-		"nette/database": "~2.2",
-		"tracy/tracy": "~2.2"
+		"php": ">=5.4",
+		"nette/di": "^2.3",
+		"nette/security": "^2.3",
+		"nette/http": "^2.3",
+		"nette/database": "^2.3",
+		"trejjam/base-extension": "^0.5",
+		"trejjam/utils": "^1.2"
 	},
 	"require-dev": {
-		"nette/tester": "@dev"
+		"nette/tester": "@dev",
+		"nette/bootstrap": "^2.3",
+		"nette/robot-loader": "^2.3",
+		"kdyby/console": "^2.4"
 	},
 	"suggest": {
 		"kdyby/console": "to use CLI configurator"
 	},
 	"autoload": {
-		"classmap": ["src/Authorization"]
+		"psr-4": {
+			"Trejjam\\Authorization\\": "src/"
+		},
+		"classmap": [
+			"src/exceptions.php"
+		]
 	},
 	"extra": {
 		"branch-alias": {
-			"dev-master": "0.8-dev"
+			"dev-master": "v0.11.x-dev"
 		}
 	}
 }

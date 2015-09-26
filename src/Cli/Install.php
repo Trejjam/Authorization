@@ -6,14 +6,14 @@
  * Time: 2:25
  */
 
-namespace Trejjam\Authorization;
+namespace Trejjam\Authorization\Cli;
 
 use Symfony\Component\Console\Command\Command,
 	Symfony\Component\Console\Input\InputInterface,
 	Symfony\Component\Console\Output\OutputInterface,
 	Nette;
 
-class CliInstall extends Command
+class Install extends Command
 {
 	const
 		FILE_USERS_TABLE = "users__users",
@@ -37,13 +37,13 @@ class CliInstall extends Command
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$connection = $this->database->getConnection();
 
-		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_USERS_TABLE));
-		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_ROLES_TABLE));
-		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_RESOURCES_TABLE));
-		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_USER_ROLE_TABLE));
-		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_USER_REQUEST_TABLE));
-		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_ROLES_DATA_TABLE));
-		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(self::FILE_IDENTITY_HASH_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(static::FILE_USERS_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(static::FILE_ROLES_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(static::FILE_RESOURCES_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(static::FILE_USER_ROLE_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(static::FILE_USER_REQUEST_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(static::FILE_ROLES_DATA_TABLE));
+		Nette\Database\Helpers::loadFromFile($connection, $this->getFile(static::FILE_IDENTITY_HASH_TABLE));
 	}
 	protected function getFile($file) {
 		return __DIR__ . "/../../../sql/" . $file . ".sql";

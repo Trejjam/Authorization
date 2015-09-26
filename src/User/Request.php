@@ -6,12 +6,12 @@
  * Time: 13:51
  */
 
-namespace Trejjam\Authorization;
+namespace Trejjam\Authorization\User;
 
 use Nette,
 	Trejjam;
 
-class UserRequest
+class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 {
 	/**
 	 * @var Nette\Database\Context
@@ -36,13 +36,35 @@ class UserRequest
 	protected function getTable() {
 		return $this->database->table($this->tables['userRequest']['table']);
 	}
+
+	/**
+	 * @param int|Nette\Database\Table\IRow $id
+	 * @return \stdClass
+	 */
+	public function getItem($id) {
+		if (!$id instanceof Nette\Database\Table\IRow) {
+			$id = $this->getTable()->get($id);
+		}
+
+		$out = (object)[
+				static::ROW => $id,
+				'id'        => $id->{$this->tables['userRequest']['id']},
+				'userId'    => $id->{$this->tables['userRequest']['user_id']},
+				'hash'      => $id->{$this->tables['userRequest']['hash']},
+				'type'      => $id->{$this->tables['userRequest']['type']},
+				'used'      => $id->{$this->tables['userRequest']['used']} == $this->tables['userRequest']['positive'],
+		];
+
+		return $out;
+	}
+
 	protected function isTypeValid($type) {
 		return in_array($type, $this->tables['userRequest']['type']['option']);
 	}
 
 	public function generateHash($userId, $type, $timeout = NULL) {
 		if (!$this->isTypeValid($type)) {
-			throw new UserRequestException("Type '$type' is not valid or registered");
+			throw new Trejjam\Authorization\UserRequestException("Type '$type' is not valid or registered");
 		}
 
 		$hash = Nette\Utils\Random::generate($this->tables['userRequest']['hash']['length'], '0-9A-Z');
@@ -73,15 +95,15 @@ class UserRequest
 		])->fetch()
 		) {
 			if (!Nette\Security\Passwords::verify($hash, $row->{$this->tables['userRequest']['hash']['name']})) {
-				throw new UserRequestException('Hash is corrupted', UserRequestException::CORRUPTED_HASH);
+				throw new Trejjam\Authorization\UserRequestException('Hash is corrupted', Trejjam\Authorization\UserRequestException::CORRUPTED_HASH);
 			}
 
 			if ($row->{$this->tables['userRequest']['used']['name']} == $this->tables['userRequest']['used']['positive']) {
-				throw new UserRequestException('Hash was used', UserRequestException::USED_HASH);
+				throw new Trejjam\Authorization\UserRequestException('Hash was used', Trejjam\Authorization\UserRequestException::USED_HASH);
 			}
 
 			if ($row->{$this->tables['userRequest']['timeout']['name']} < $this->getSqlTime()) {
-				throw new UserRequestException('Hash timeout', UserRequestException::HASH_TIMEOUT);
+				throw new Trejjam\Authorization\UserRequestException('Hash timeout', Trejjam\Authorization\UserRequestException::HASH_TIMEOUT);
 			}
 
 			if ($invalidateHash) {
@@ -93,7 +115,7 @@ class UserRequest
 			return $row->{$this->tables['userRequest']['type']['name']};
 		}
 
-		throw new UserRequestException("Permission denied to requestId '$requestId' for user '$userId'", UserRequestException::PERMISSION_DENIED);
+		throw new Trejjam\Authorization\UserRequestException("Permission denied to requestId '$requestId' for user '$userId'", Trejjam\Authorization\UserRequestException::PERMISSION_DENIED);
 	}
 
 	private function getSqlTime() {

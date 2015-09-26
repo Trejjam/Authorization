@@ -6,7 +6,7 @@
  * Time: 20:34
  */
 
-namespace Trejjam\Authorization;
+namespace Trejjam\Authorization\User;
 
 
 use Nette,
@@ -15,18 +15,28 @@ use Nette,
 class User extends Nette\Security\User
 {
 	/**
-	 * @var UserStorage
+	 * @var Storage
 	 */
 	protected $storage;
-
+	/**
+	 * @var IdentityHash
+	 */
+	protected $identityHash;
+	/**
+	 * @var bool
+	 */
 	protected $reloadChangedUser;
 
-	public function __construct(UserStorage $storage, Nette\Security\IAuthenticator $authenticator = NULL, Nette\Security\IAuthorizator $authorizator = NULL) {
+	public function __construct(Storage $storage, Authenticator $authenticator = NULL, Nette\Security\IAuthorizator $authorizator = NULL, IdentityHash $identityHash) {
 		parent::__construct($storage, $authenticator, $authorizator);
 
 		$this->storage = $storage;
+		$this->identityHash = $identityHash;
 	}
 
+	/**
+	 * @param bool $reloadChangedUser
+	 */
 	public function setParams($reloadChangedUser) {
 		$this->reloadChangedUser = $reloadChangedUser;
 
@@ -36,35 +46,38 @@ class User extends Nette\Security\User
 	}
 
 	public function logout($clearIdentity = FALSE) {
-		if (!is_null($this->storage->getIdentity())) {
-			$this->storage->setAction('destroyed');
+		$identity = $this->storage->getIdentity();
+		if (!is_null($identity)) {
+			$this->identityHash->setAction($identity->getId(), IdentityHash::ACTION_DESTROYED);
 		}
 
 		parent::logout($clearIdentity);
 	}
 	protected function checkIdentityAction() {
 		if ($this->storage->isAuthenticated()) {
-			$action = $this->storage->getAction();
+			$identity = $this->storage->getIdentity();
+
+			$action = $this->identityHash->getHashAction($identity->hash);
 
 			if (is_null($action)) {
 				parent::logout();
 			}
 
 			switch ($action) {
-				case 'reload':
+				case IdentityHash::ACTION_RELOAD:
 					try {
 						$this->login($this->getId(), NULL);
 					}
-					catch (UserManagerException $e) {
+					catch (Trejjam\Authorization\UserManagerException $e) {
 						$this->logout();
 					}
 
 					break;
-				case 'logout':
+				case IdentityHash::ACTION_LOGOUT:
 					$this->logout();
 
 					break;
-				case 'destroyed':
+				case IdentityHash::ACTION_DESTROYED:
 					$this->logout();
 
 					break;

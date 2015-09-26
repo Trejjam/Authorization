@@ -6,7 +6,7 @@
  * Time: 2:25
  */
 
-namespace Trejjam\Authorization;
+namespace Trejjam\Authorization\Cli;
 
 use Symfony\Component\Console\Input\InputArgument,
 	Symfony\Component\Console\Input\InputOption,
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputArgument,
 	Symfony\Component\Console\Input\ArrayInput,
 	Nette;
 
-class CliResource extends CliHelper
+class Resource extends Helper
 {
 	protected function configure() {
 		$this->setName('Auth:resource')

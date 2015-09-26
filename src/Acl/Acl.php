@@ -5,10 +5,11 @@
  * Date: 8.9.14
  * Time: 17:36
  */
-namespace Trejjam\Authorization;
+namespace Trejjam\Authorization\Acl;
 
 use Nette,
-	Nette\Caching;
+	Nette\Caching,
+	Trejjam;
 
 class Acl extends Nette\Security\Permission
 {
@@ -32,7 +33,7 @@ class Acl extends Nette\Security\Permission
 	protected $tables;
 
 	/**
-	 * @var Acl\Trees
+	 * @var Trees
 	 */
 	protected $trees = NULL;
 
@@ -60,7 +61,7 @@ class Acl extends Nette\Security\Permission
 				$this->setupResource($v);
 			}
 		}
-		catch (TableNotFoundException $e) {
+		catch (Trejjam\Authorization\TableNotFoundException $e) {
 			dump($e->getMessage());
 		}
 	}
@@ -71,15 +72,15 @@ class Acl extends Nette\Security\Permission
 	}
 
 	/**
-	 * @return Acl\Trees
+	 * @return Trees
 	 */
 	public function getTrees() {
-		return is_null($this->trees) ? ($this->trees = $this->cacheLoad(self::CACHE_TREES, function () {
-			return new Acl\Trees($this->database, $this->tables);
+		return is_null($this->trees) ? ($this->trees = $this->cacheLoad(static::CACHE_TREES, function () {
+			return new Trees($this->database, $this->tables);
 		})) : $this->trees;
 	}
 
-	protected function setupRoles(Acl\Role $role) {
+	protected function setupRoles(Role $role) {
 		if ($role->hasChild()) {
 			$parents = [];
 			foreach ($role->getChild() as $v) {
@@ -92,7 +93,7 @@ class Acl extends Nette\Security\Permission
 			$this->addRole($role->getName());
 		}
 	}
-	protected function setupResource(Acl\Resource $resource) {
+	protected function setupResource(Resource $resource) {
 		if ($resource->getName() === $resource->getNameRaw() && !$this->hasResource($resource->getName())) {
 			$this->addResource($resource->getName());
 		}
@@ -107,7 +108,7 @@ class Acl extends Nette\Security\Permission
 		$out = [];
 
 		foreach ($this->database->table($this->tables["userRoles"]["table"])
-								->where([$this->tables["userRoles"]["userId"] => $id]) as $v) {
+								->where([$this->tables["userRoles"]["userId"] => Nette\Utils\Validators::isNumericInt($id) ? $id : $id->id]) as $v) {
 			$out[] = $this->getTrees()->getRoles()[$v->{$this->tables["userRoles"]["roleId"]}]->getName();
 		}
 
@@ -116,7 +117,7 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param int    $userId
 	 * @param string $roleName
-	 * @throws RoleException
+	 * @throws Trejjam\Authorization\RoleException
 	 */
 	public function addUserRole($userId, $roleName) {
 		$role = $this->getRoleByName($roleName);
@@ -133,7 +134,7 @@ class Acl extends Nette\Security\Permission
 				$this->database->table($this->tables["userRoles"]["table"])->insert($roleArr);
 			}
 			else {
-				throw new RoleException("The user is already member of the role: " . $roleName, RoleException::ALREADY_IN_ROLE);
+				throw new Trejjam\Authorization\RoleException("The user is already member of the role: " . $roleName, Trejjam\Authorization\RoleException::ALREADY_IN_ROLE);
 			}
 		}
 	}
@@ -158,7 +159,7 @@ class Acl extends Nette\Security\Permission
 	 * @param string      $role
 	 * @param string|null $parent
 	 * @param string      $info
-	 * @throws RoleException
+	 * @throws Trejjam\Authorization\RoleException
 	 */
 	public function createRole($role, $parent = NULL, $info = "") {
 		$dbArr = [
@@ -169,7 +170,7 @@ class Acl extends Nette\Security\Permission
 		if (!is_null($parent)) {
 			$parentRole = $this->getRoleByName($parent);
 			if (is_null($parentRole)) {
-				throw new RoleException("Role " . $parent . " not exist", RoleException::NOT_EXIST);
+				throw new Trejjam\Authorization\RoleException("Role " . $parent . " not exist", Trejjam\Authorization\RoleException::NOT_EXIST);
 			}
 
 			$dbArr[$this->tables["roles"]["parentId"]] = $parentRole->getId();
@@ -177,7 +178,7 @@ class Acl extends Nette\Security\Permission
 
 		$roleDb = $this->database->table($this->tables["roles"]["table"])->where($dbArr)->fetch();
 		if ($roleDb) {
-			throw new RoleException("Role " . $role . " already exist", RoleException::ALREADY_EXIST);
+			throw new Trejjam\Authorization\RoleException("Role " . $role . " already exist", Trejjam\Authorization\RoleException::ALREADY_EXIST);
 		}
 
 		if (is_string($this->tables["roles"]["info"])) {
@@ -192,7 +193,7 @@ class Acl extends Nette\Security\Permission
 			unset($tableInfo["info"]);
 		}
 
-		$aclRole = new Acl\Role($DBrole, $tableInfo);
+		$aclRole = new Role($DBrole, $tableInfo);
 		$this->getTrees()->registerRole($aclRole);
 
 		$this->invalidateCache();
@@ -200,7 +201,7 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param string $role
 	 * @param string $parent
-	 * @throws RoleException
+	 * @throws Trejjam\Authorization\RoleException
 	 */
 	public function moveRole($role, $parent) {
 		$dbArr = [
@@ -209,19 +210,19 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
+			throw new Trejjam\Authorization\RoleException("Role " . $role . " not exist", Trejjam\Authorization\RoleException::NOT_EXIST);
 		}
 
 		if (!is_null($parent)) {
 			$aclParent = $this->getRoleByName($parent);
 			if (is_null($aclParent)) {
-				throw new RoleException("Role " . $parent . " not exist", RoleException::NOT_EXIST);
+				throw new Trejjam\Authorization\RoleException("Role " . $parent . " not exist", Trejjam\Authorization\RoleException::NOT_EXIST);
 			}
 
 			$dbArr[$this->tables["roles"]["parentId"]] = $aclParent->getId();
 
 			if ($this->findCircle($aclRole, $aclParent)) {
-				throw new RoleException("Connecting role ($role) to parent ($parent) forming a circle", RoleException::CREATE_CIRCLE);
+				throw new Trejjam\Authorization\RoleException("Connecting role ($role) to parent ($parent) forming a circle", Trejjam\Authorization\RoleException::CREATE_CIRCLE);
 			}
 		}
 
@@ -235,13 +236,13 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param string $role
 	 * @param bool   $force
-	 * @throws RoleException
+	 * @throws Trejjam\Authorization\RoleException
 	 */
 	public function deleteRole($role, $force = FALSE) {
 		$aclRole = $this->getRoleByName($role);
 
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
+			throw new Trejjam\Authorization\RoleException("Role " . $role . " not exist", Trejjam\Authorization\RoleException::NOT_EXIST);
 		}
 
 		if ($force) {
@@ -261,7 +262,7 @@ class Acl extends Nette\Security\Permission
 	}
 	/**
 	 * @param $role
-	 * @return null|Acl\Role
+	 * @return null|Role
 	 */
 	public function getRoleByName($role) {
 		foreach ($this->getTrees()->getRoles() as $v) {
@@ -272,7 +273,7 @@ class Acl extends Nette\Security\Permission
 
 		return NULL;
 	}
-	protected function findCircle(Acl\Role $role, Acl\Role $parent) {
+	protected function findCircle(Role $role, Role $parent) {
 		if ($role->getId() == $parent->getId()) {
 			return TRUE;
 		}
@@ -288,25 +289,25 @@ class Acl extends Nette\Security\Permission
 	 * @param string      $resource
 	 * @param string|null $resourceAction
 	 * @param string      $role
-	 * @throws ResourceException
-	 * @throws RoleException
+	 * @throws Trejjam\Authorization\ResourceException
+	 * @throws Trejjam\Authorization\RoleException
 	 */
 	public function createResource($resource, $resourceAction = NULL, $role) {
 		$dbArr = [
 			$this->tables["resource"]["resourceName"]   => $resource,
-			$this->tables["resource"]["resourceAction"] => is_null($resourceAction) ? self::DEFAULT_RESOURCE_ACTION : $resourceAction,
+			$this->tables["resource"]["resourceAction"] => is_null($resourceAction) ? static::DEFAULT_RESOURCE_ACTION : $resourceAction,
 		];
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
+			throw new Trejjam\Authorization\RoleException("Role " . $role . " not exist", Trejjam\Authorization\RoleException::NOT_EXIST);
 		}
 
 		$dbArr[$this->tables["resource"]["roleId"]] = $aclRole->getId();
 
 		$resourceDb = $this->database->table($this->tables["resource"]["table"])->where($dbArr)->fetch();
 		if ($resourceDb) {
-			throw new ResourceException("Resource " . $resource . " already exist", ResourceException::ALREADY_EXIST);
+			throw new Trejjam\Authorization\ResourceException("Resource " . $resource . " already exist", Trejjam\Authorization\ResourceException::ALREADY_EXIST);
 		}
 
 		$DBresource = $this->database->table($this->tables["resource"]["table"])->insert($dbArr);
@@ -314,8 +315,8 @@ class Acl extends Nette\Security\Permission
 		$tableInfo = $this->tables["resource"];
 		unset($tableInfo["table"]);
 
-		$AclResource = new Acl\Resource($DBresource, $tableInfo);
-		$this->getTrees()->registerResource($AclResource);
+		$aclResource = new Resource($DBresource, $tableInfo);
+		$this->getTrees()->registerResource($aclResource);
 
 		$this->invalidateCache();
 	}
@@ -323,8 +324,8 @@ class Acl extends Nette\Security\Permission
 	 * @param string      $resource
 	 * @param string|null $resourceAction
 	 * @param string      $role
-	 * @throws ResourceException
-	 * @throws RoleException
+	 * @throws Trejjam\Authorization\ResourceException
+	 * @throws Trejjam\Authorization\RoleException
 	 */
 	public function moveResource($resource, $resourceAction = NULL, $role) {
 		$dbArr = [];
@@ -333,7 +334,7 @@ class Acl extends Nette\Security\Permission
 
 		$aclRole = $this->getRoleByName($role);
 		if (is_null($aclRole)) {
-			throw new RoleException("Role " . $role . " not exist", RoleException::NOT_EXIST);
+			throw new Trejjam\Authorization\RoleException("Role " . $role . " not exist", Trejjam\Authorization\RoleException::NOT_EXIST);
 		}
 
 		$dbArr[$this->tables["resource"]["roleId"]] = $aclRole->getId();
@@ -345,7 +346,7 @@ class Acl extends Nette\Security\Permission
 	/**
 	 * @param string      $resource
 	 * @param string|null $resourceAction
-	 * @throws ResourceException
+	 * @throws Trejjam\Authorization\ResourceException
 	 */
 	public function deleteResource($resource, $resourceAction = NULL) {
 		$resourceDb = $this->getResource($resource, $resourceAction);
@@ -357,8 +358,8 @@ class Acl extends Nette\Security\Permission
 
 	/**
 	 * @param int $id
-	 * @return Acl\Resource
-	 * @throws ResourceException
+	 * @return Resource
+	 * @throws Trejjam\Authorization\ResourceException
 	 */
 	public function getResourceById($id) {
 		$resources = $this->getTrees()->getResources();
@@ -367,13 +368,14 @@ class Acl extends Nette\Security\Permission
 			return $resources[$id];
 		}
 		else {
-			throw new ResourceException("Resource not exist", ResourceException::NOT_EXIST);
+			throw new Trejjam\Authorization\ResourceException("Resource not exist", Trejjam\Authorization\ResourceException::NOT_EXIST);
 		}
 	}
+
 	protected function getResource($resource, $resourceAction = NULL) {
 		$dbArr = [
 			$this->tables["resource"]["resourceName"]   => $resource,
-			$this->tables["resource"]["resourceAction"] => is_null($resourceAction) ? self::DEFAULT_RESOURCE_ACTION : $resourceAction,
+			$this->tables["resource"]["resourceAction"] => is_null($resourceAction) ? static::DEFAULT_RESOURCE_ACTION : $resourceAction,
 		];
 
 		$resourceDb = $this->database->table($this->tables["resource"]["table"])->where($dbArr)->fetch();
@@ -382,7 +384,7 @@ class Acl extends Nette\Security\Permission
 			return $resourceDb;
 		}
 		else {
-			throw new ResourceException("Resource $resource:$resourceAction not exist", ResourceException::NOT_EXIST);
+			throw new Trejjam\Authorization\ResourceException("Resource $resource:$resourceAction not exist", Trejjam\Authorization\ResourceException::NOT_EXIST);
 		}
 	}
 
@@ -390,7 +392,7 @@ class Acl extends Nette\Security\Permission
 	 * @param bool $needReloadNow
 	 */
 	public function invalidateCache($needReloadNow = FALSE) {
-		$this->cacheRemove(self::CACHE_TREES);
+		$this->cacheRemove(static::CACHE_TREES);
 
 		if ($needReloadNow) {
 			$this->trees = NULL;

@@ -12,13 +12,33 @@ namespace Trejjam\Authorization;
 use Nette,
 	Trejjam;
 
-class TableNotFoundException extends \Exception
+interface IException
+{
+
+}
+
+class Exception extends \Exception implements IException
+{
+
+}
+
+interface ILogicException
+{
+
+}
+
+class LogicException extends \LogicException implements ILogicException
+{
+
+}
+
+class TableNotFoundException extends Exception
 {
 	const
 		TABLE_NOT_FOUND = 1;
 }
 
-class RoleException extends \LogicException
+class RoleException extends LogicException
 {
 	const
 		NOT_EXIST = 1,
@@ -27,14 +47,14 @@ class RoleException extends \LogicException
 		ALREADY_IN_ROLE = 8;
 }
 
-class ResourceException extends \LogicException
+class ResourceException extends LogicException
 {
 	const
 		NOT_EXIST = 1,
 		ALREADY_EXIST = 2;
 }
 
-class UserManagerException extends \LogicException
+class UserManagerException extends LogicException
 {
 	const
 		NOT_EXIST_USERNAME = 1,
@@ -44,16 +64,18 @@ class UserManagerException extends \LogicException
 		LONG_USERNAME = 16,
 		NOT_VALID_USERNAME = 32,
 		UNRECOGNIZED_TYPE = 64,
-		ACTION_NOT_ENABLED = 128;
+			ACTION_NOT_ENABLED = 128,
+			UNKNOWN_VALUE = 256,
+			ID_NOT_FOUND = 512;
 }
 
-class UserConfigurationException extends \LogicException
+class UserConfigurationException extends LogicException
 {
 	const
 		INFO_IS_DISABLED = 1;
 }
 
-class UserRequestException extends \LogicException
+class UserRequestException extends LogicException
 {
 	const
 		PERMISSION_DENIED = 1,
@@ -62,7 +84,7 @@ class UserRequestException extends \LogicException
 		HASH_TIMEOUT = 8;
 }
 
-class UserStorageException extends \LogicException
+class UserStorageException extends LogicException
 {
 	const
 		IDENTITY_NOT_EXIST = 1,
