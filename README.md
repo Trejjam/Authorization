@@ -45,12 +45,12 @@ authorization:
 				match  : '/^[a-zA-Z_]+$/' #email is special value (validate by Nette\Utils\Validators:isEmail)
 				length : 60
 			items:
-                - id
-                - status
-                - activated
-                - username
-                - password
-                dateCreated: date_created
+				- id
+				- status
+				- activated
+				- username
+				- password
+				dateCreated: date_created
 		roles:
 			table    : users__roles
 			id       : id #column name
