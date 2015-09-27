@@ -20,10 +20,9 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 
 	/**
 	 * @param Nette\Database\Context        $database
-	 * @param Trejjam\Authorization\Acl\Acl $acl
 	 * @param IdentityHash                  $identityHash
 	 */
-	public function __construct(Nette\Database\Context $database, Trejjam\Authorization\Acl\Acl $acl, IdentityHash $identityHash) {
+	public function __construct(Nette\Database\Context $database, IdentityHash $identityHash) {
 		$this->database = $database;
 		$this->identityHash = $identityHash;
 	}
