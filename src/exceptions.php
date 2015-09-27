@@ -81,7 +81,7 @@ class ManagerException extends LogicException
 		UNKNOWN_VALUE = 128;
 }
 
-class_alias('ManagerException', 'Trejjam\Authorization\UserManagerException');
+class_alias('Trejjam\Authorization\User\ManagerException', 'Trejjam\Authorization\UserManagerException');
 
 class IdentityHashException extends LogicException
 {
@@ -89,7 +89,7 @@ class IdentityHashException extends LogicException
 		ACTION_NOT_ENABLED = 1;
 }
 
-class_alias('IdentityHashException', 'Trejjam\Authorization\IdentityHashException');
+class_alias('Trejjam\Authorization\User\IdentityHashException', 'Trejjam\Authorization\IdentityHashException');
 
 class AuthenticatorException extends Nette\Security\AuthenticationException implements ILogicException
 {
@@ -98,7 +98,7 @@ class AuthenticatorException extends Nette\Security\AuthenticationException impl
 		NOT_DEFINED_PASSWORD = 2;
 }
 
-class_alias('AuthenticatorException', 'Trejjam\Authorization\AuthenticatorException');
+class_alias('Trejjam\Authorization\User\AuthenticatorException', 'Trejjam\Authorization\AuthenticatorException');
 
 class RequestException extends LogicException
 {
@@ -109,10 +109,10 @@ class RequestException extends LogicException
 		HASH_TIMEOUT = 8;
 }
 
-class_alias('RequestException', 'Trejjam\Authorization\UserRequestException');
+class_alias('Trejjam\Authorization\User\RequestException', 'Trejjam\Authorization\UserRequestException');
 
 class StorageException extends LogicException
 {
 }
 
-class_alias('StorageException', 'Trejjam\Authorization\UserStorageException');
+class_alias('Trejjam\Authorization\User\StorageException', 'Trejjam\Authorization\UserStorageException');
