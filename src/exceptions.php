@@ -8,28 +8,23 @@
 
 namespace Trejjam\Authorization;
 
-
 use Nette,
 	Trejjam;
 
 interface IException
 {
-
 }
 
 class Exception extends \Exception implements IException
 {
-
 }
 
 interface ILogicException
 {
-
 }
 
 class LogicException extends \LogicException implements ILogicException
 {
-
 }
 
 class TableNotFoundException extends Exception
@@ -67,12 +62,10 @@ use Nette,
 
 interface ILogicException extends Trejjam\Authorization\ILogicException
 {
-
 }
 
 class LogicException extends Trejjam\Authorization\LogicException implements ILogicException
 {
-
 }
 
 class ManagerException extends LogicException
@@ -120,7 +113,6 @@ class_alias('RequestException', 'Trejjam\Authorization\UserRequestException');
 
 class StorageException extends LogicException
 {
-
 }
 
 class_alias('StorageException', 'Trejjam\Authorization\UserStorageException');
