@@ -11,7 +11,8 @@ namespace Trejjam\Authorization\Cli;
 use Symfony\Component\Console\Command\Command,
 	Symfony\Component\Console\Input\InputInterface,
 	Symfony\Component\Console\Output\OutputInterface,
-	Nette;
+	Nette,
+	Trejjam;
 
 class Install extends Command
 {

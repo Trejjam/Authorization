@@ -13,7 +13,8 @@ use Symfony\Component\Console\Input\InputArgument,
 	Symfony\Component\Console\Input\InputInterface,
 	Symfony\Component\Console\Output\OutputInterface,
 	Symfony\Component\Console\Input\ArrayInput,
-	Nette;
+	Nette,
+	Trejjam;
 
 class Resource extends Helper
 {
@@ -78,10 +79,10 @@ class Resource extends Helper
 
 						$this->acl->createResource($rName, $rAction, $parentRole);
 					}
-					catch (ResourceException $e) {
+					catch (Trejjam\Authorization\ResourceException $e) {
 						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 					}
-					catch (RoleException $e) {
+					catch (Trejjam\Authorization\RoleException $e) {
 						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 					}
 				}
@@ -103,10 +104,10 @@ class Resource extends Helper
 
 						$this->acl->moveResource($rName, $rAction, $parentRole);
 					}
-					catch (ResourceException $e) {
+					catch (Trejjam\Authorization\ResourceException $e) {
 						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 					}
-					catch (RoleException $e) {
+					catch (Trejjam\Authorization\RoleException $e) {
 						$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 					}
 				}
@@ -127,7 +128,7 @@ class Resource extends Helper
 
 					$this->acl->deleteResource($rName, $rAction);
 				}
-				catch (ResourceException $e) {
+				catch (Trejjam\Authorization\ResourceException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}
@@ -142,7 +143,7 @@ class Resource extends Helper
 				'-r' => TRUE
 			);
 			$roleInput = new ArrayInput($arguments);
-			$role = new CliRole($this->userManager, $this->acl);
+			$role = new Role($this->userManager, $this->acl);
 
 			$role->run($roleInput, $output);
 		}

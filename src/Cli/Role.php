@@ -12,7 +12,8 @@ use Symfony\Component\Console\Input\InputArgument,
 	Symfony\Component\Console\Input\InputOption,
 	Symfony\Component\Console\Input\InputInterface,
 	Symfony\Component\Console\Output\OutputInterface,
-	Nette;
+	Nette,
+	Trejjam;
 
 class Role extends Helper
 {
@@ -76,7 +77,7 @@ class Role extends Helper
 				try {
 					$this->acl->createRole($role, $parentRole, $info);
 				}
-				catch (RoleException $e) {
+				catch (Trejjam\Authorization\RoleException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}
@@ -89,7 +90,7 @@ class Role extends Helper
 				try {
 					$this->acl->moveRole($role, $parentRole);
 				}
-				catch (RoleException $e) {
+				catch (Trejjam\Authorization\RoleException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}
@@ -102,7 +103,7 @@ class Role extends Helper
 				try {
 					$this->acl->deleteRole($role, $forceDelete);
 				}
-				catch (RoleException $e) {
+				catch (Trejjam\Authorization\RoleException $e) {
 					$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 				}
 			}
@@ -120,10 +121,11 @@ class Role extends Helper
 		}
 	}
 
-	protected function drawRole(OutputInterface $output, Acl\Role $role, $depth = 0) {
+	protected function drawRole(OutputInterface $output, Trejjam\Authorization\Acl\Role $role, $depth = 0) {
 		$output->writeln(Nette\Utils\Strings::padLeft('', $depth, ' ') . '\_ ' . $role->getName());
 
 		$resource = [];
+		/** @var Trejjam\Authorization\Acl\Resource $v */
 		foreach ($role->getResource() as $v) {
 			$resource[] = $v->getNameRaw() . ":" . $v->getActionRaw();
 		}
@@ -132,6 +134,7 @@ class Role extends Helper
 			$output->writeln(Nette\Utils\Strings::padLeft('', $depth + 2, ' ') . "-" . implode(", ", $resource));
 		}
 
+		/** @var Trejjam\Authorization\Acl\Role $v */
 		foreach ($role->getChild() as $v) {
 			$this->drawRole($output, $v, $depth + 1);
 		}

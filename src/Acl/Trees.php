@@ -23,7 +23,7 @@ class Trees
 	 */
 	protected $rootRoles = [];
 	/**
-	 * @var Resource[]
+	 * @var Trejjam\Authorization\Acl\Resource[]
 	 */
 	protected $resource = [];
 
@@ -96,7 +96,7 @@ class Trees
 		return $this->rootRoles;
 	}
 	/**
-	 * @return Resource[]
+	 * @return Trejjam\Authorization\Acl\Resource[]
 	 */
 	public function getResources() {
 		return $this->resource;

@@ -12,7 +12,8 @@ use Symfony\Component\Console\Input\InputArgument,
 	Symfony\Component\Console\Input\InputOption,
 	Symfony\Component\Console\Input\InputInterface,
 	Symfony\Component\Console\Output\OutputInterface,
-	Nette;
+	Nette,
+	Trejjam;
 
 class User extends Helper
 {
@@ -85,10 +86,10 @@ class User extends Helper
 		if ($create && !is_null($password)) {
 			try {
 				if (!$this->userManager->add($username, $password)) {
-					throw new UserManagerException('User already exist');
+					throw new Trejjam\Authorization\User\ManagerException('User already exist');
 				}
 			}
-			catch (UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -96,7 +97,7 @@ class User extends Helper
 			try {
 				$this->userManager->changePassword($username, $password);
 			}
-			catch (UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -105,10 +106,10 @@ class User extends Helper
 			try {
 				$this->userManager->setStatus($username, $status);
 
-				$userId = $this->userManager->getUserId($username);
-				$this->userManager->setUpdated($userId, "id");
+				$user = $this->userManager->getUserByUsername($username);
+				$this->userManager->setUpdated($user);
 			}
-			catch (UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
@@ -116,49 +117,49 @@ class User extends Helper
 			try {
 				$this->userManager->setActivated($username, $activated);
 
-				$userId = $this->userManager->getUserId($username);
-				$this->userManager->setUpdated($userId, "id");
+				$user = $this->userManager->getUserByUsername($username);
+				$this->userManager->setUpdated($user);
 			}
-			catch (UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
 
 		if (!is_null($role_add)) {
 			try {
-				$userId = $this->userManager->getUserId($username);
+				$user = $this->userManager->getUserByUsername($username);
 				foreach ($role_add as $v) {
-					$this->acl->addUserRole($userId, $v);
+					$this->acl->addUserRole($user, $v);
 				}
 
-				$this->userManager->setUpdated($userId, "id");
+				$this->userManager->setUpdated($user);
 			}
-			catch (UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
 		if (!is_null($role_remove)) {
 			try {
-				$userId = $this->userManager->getUserId($username);
+				$user = $this->userManager->getUserByUsername($username);
 				foreach ($role_remove as $v) {
-					$this->acl->removeUserRole($userId, $v);
+					$this->acl->removeUserRole($user, $v);
 				}
 
-				$this->userManager->setUpdated($userId, "id");
+				$this->userManager->setUpdated($user);
 			}
-			catch (UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}
 
 		if ($roles) {
 			try {
-				$roles = $this->acl->getUserRoles($this->userManager->getUserId($username));
+				$roles = $this->acl->getUserRoles($this->userManager->getUserByUsername($username));
 
 				$output->writeln("User roles:");
 				$output->writeln($roles);
 			}
-			catch (UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$output->writeln("<error>Error: " . $e->getMessage() . ", code: " . $e->getCode() . "</error>");
 			}
 		}

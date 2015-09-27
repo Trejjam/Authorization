@@ -140,11 +140,11 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	protected function getUser($username, $type = 'username') {
-		if ($username instanceof Nette\Database\Table\IRow) {
-			return $this->getItem($username);
-		}
-		else if ($username instanceof \stdClass) {
+		if (isset($username->{static::ROW})) {
 			return $username;
+		}
+		else if ($username instanceof Nette\Database\Table\IRow) {
+			return $this->getItem($username);
 		}
 
 		switch ($type) {

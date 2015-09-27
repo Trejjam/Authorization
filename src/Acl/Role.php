@@ -29,7 +29,7 @@ class Role
 	protected $child = [];
 
 	/**
-	 * @var Resource[]
+	 * @var Trejjam\Authorization\Acl\Resource[]
 	 */
 	protected $resources = [];
 
@@ -55,14 +55,14 @@ class Role
 	}
 
 	/**
-	 * @param Resource $resource
+	 * @param Trejjam\Authorization\Acl\Resource $resource
 	 */
 	public function addResource(Resource $resource) {
 		$this->resources[$resource->getId()] = $resource;
 	}
 	/**
 	 * @param Role[]     $role
-	 * @param Resource[] $resource
+	 * @param Trejjam\Authorization\Acl\Resource[] $resource
 	 */
 	public function fillArrays(array &$role, array &$resource) {
 		$role[$this->getId()] = $this;
@@ -127,7 +127,7 @@ class Role
 	}
 
 	/**
-	 * @return Resource[]
+	 * @return Trejjam\Authorization\Acl\Resource[]
 	 */
 	public function getResource() {
 		return $this->resources;

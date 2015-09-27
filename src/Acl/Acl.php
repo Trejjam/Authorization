@@ -101,30 +101,30 @@ class Acl extends Nette\Security\Permission
 	}
 
 	/**
-	 * @param int $id
+	 * @param int $user
 	 * @return array
 	 */
-	public function getUserRoles($id) {
+	public function getUserRoles($user) {
 		$out = [];
 
 		foreach ($this->database->table($this->tables["userRoles"]["table"])
-								->where([$this->tables["userRoles"]["userId"] => Nette\Utils\Validators::isNumericInt($id) ? $id : $id->id]) as $v) {
+								->where([$this->tables["userRoles"]["userId"] => Nette\Utils\Validators::isNumericInt($user) ? $user : $user->id]) as $v) {
 			$out[] = $this->getTrees()->getRoles()[$v->{$this->tables["userRoles"]["roleId"]}]->getName();
 		}
 
 		return $out;
 	}
 	/**
-	 * @param int    $userId
+	 * @param int    $user
 	 * @param string $roleName
 	 * @throws Trejjam\Authorization\RoleException
 	 */
-	public function addUserRole($userId, $roleName) {
+	public function addUserRole($user, $roleName) {
 		$role = $this->getRoleByName($roleName);
 
 		if (!is_null($role)) {
 			$roleArr = [
-				$this->tables["userRoles"]["userId"] => $userId,
+				$this->tables["userRoles"]["userId"] => Nette\Utils\Validators::isNumericInt($user) ? $user : $user->id,
 				$this->tables["userRoles"]["roleId"] => $role->getId()
 			];
 
@@ -142,12 +142,12 @@ class Acl extends Nette\Security\Permission
 	 * @param int    $userId
 	 * @param string $roleName
 	 */
-	public function removeUserRole($userId, $roleName) {
+	public function removeUserRole($user, $roleName) {
 		$role = $this->getRoleByName($roleName);
 
 		if (!is_null($role)) {
 			$roleArr = [
-				$this->tables["userRoles"]["userId"] => $userId,
+				$this->tables["userRoles"]["userId"] => Nette\Utils\Validators::isNumericInt($user) ? $user : $user->id,
 				$this->tables["userRoles"]["roleId"] => $role->getId()
 			];
 
@@ -358,7 +358,7 @@ class Acl extends Nette\Security\Permission
 
 	/**
 	 * @param int $id
-	 * @return Resource
+	 * @return Trejjam\Authorization\Acl\Resource
 	 * @throws Trejjam\Authorization\ResourceException
 	 */
 	public function getResourceById($id) {
