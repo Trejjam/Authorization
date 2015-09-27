@@ -176,9 +176,9 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 				return FALSE;
 			}
 			catch (Trejjam\Authorization\User\ManagerException $e) {
-				$this->database->table($this->tables["users"]["table"])->insert([
-					$this->tables["users"]["username"]["name"] => $username,
-					$this->tables["users"]["password"]         => is_null($password) ? $password : Nette\Security\Passwords::hash($password),
+				$this->database->table($this->tables['users']['table'])->insert([
+					$this->getTableCell('username') => $username,
+					$this->getTableCell('password') => is_null($password) ? $password : Nette\Security\Passwords::hash($password),
 				]);
 
 				return TRUE;
@@ -200,7 +200,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		$user = $this->getUser($username, $type);
 
 		$user->{static::ROW}->update([
-			$this->tables["users"]["password"] => Nette\Security\Passwords::hash($password),
+			$this->getTableCell('password') => Nette\Security\Passwords::hash($password),
 		]);
 	}
 
@@ -253,7 +253,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		$user = $this->getUser($username, $type);
 
 		$user->{static::ROW}->update([
-			$this->tables["users"]["activated"]["name"] => $activated,
+			$this->getTableCell('activated') => $activated,
 		]);
 	}
 	/**
@@ -289,7 +289,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		$user = $this->getUser($username, $type);
 
 		$user->{static::ROW}->update([
-			$this->tables["users"]["status"]["name"] => $status,
+			$this->getTableCell('status') => $status,
 		]);
 	}
 
