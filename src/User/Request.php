@@ -64,7 +64,7 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 
 	public function generateHash($userId, $type, $timeout = NULL) {
 		if (!$this->isTypeValid($type)) {
-			throw new Trejjam\Authorization\UserRequestException("Type '$type' is not valid or registered");
+			throw new Trejjam\Authorization\User\RequestException("Type '$type' is not valid or registered");
 		}
 
 		$hash = Nette\Utils\Random::generate($this->tables['userRequest']['hash']['length'], '0-9A-Z');
@@ -95,15 +95,15 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 		])->fetch()
 		) {
 			if (!Nette\Security\Passwords::verify($hash, $row->{$this->tables['userRequest']['hash']['name']})) {
-				throw new Trejjam\Authorization\UserRequestException('Hash is corrupted', Trejjam\Authorization\UserRequestException::CORRUPTED_HASH);
+				throw new Trejjam\Authorization\User\RequestException('Hash is corrupted', Trejjam\Authorization\User\RequestException::CORRUPTED_HASH);
 			}
 
 			if ($row->{$this->tables['userRequest']['used']['name']} == $this->tables['userRequest']['used']['positive']) {
-				throw new Trejjam\Authorization\UserRequestException('Hash was used', Trejjam\Authorization\UserRequestException::USED_HASH);
+				throw new Trejjam\Authorization\User\RequestException('Hash was used', Trejjam\Authorization\User\RequestException::USED_HASH);
 			}
 
 			if ($row->{$this->tables['userRequest']['timeout']['name']} < $this->getSqlTime()) {
-				throw new Trejjam\Authorization\UserRequestException('Hash timeout', Trejjam\Authorization\UserRequestException::HASH_TIMEOUT);
+				throw new Trejjam\Authorization\User\RequestException('Hash timeout', Trejjam\Authorization\User\RequestException::HASH_TIMEOUT);
 			}
 
 			if ($invalidateHash) {
@@ -115,7 +115,7 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 			return $row->{$this->tables['userRequest']['type']['name']};
 		}
 
-		throw new Trejjam\Authorization\UserRequestException("Permission denied to requestId '$requestId' for user '$userId'", Trejjam\Authorization\UserRequestException::PERMISSION_DENIED);
+		throw new Trejjam\Authorization\User\RequestException("Permission denied to requestId '$requestId' for user '$userId'", Trejjam\Authorization\User\RequestException::PERMISSION_DENIED);
 	}
 
 	private function getSqlTime() {

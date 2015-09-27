@@ -35,6 +35,7 @@ class Authenticator implements Nette\Security\IAuthenticator
 	/**
 	 * Performs an authentication against e.g. database.
 	 * and returns IIdentity on success or throws AuthenticationException
+	 * @var array $credentials
 	 * @return Nette\Security\IIdentity
 	 * @throws Nette\Security\AuthenticationException
 	 */
@@ -48,8 +49,10 @@ class Authenticator implements Nette\Security\IAuthenticator
 			$user = $this->manager->getUserByUsername($username);
 
 			if (is_null($user->password)) {
-				throw new Trejjam\Authorization\AuthenticatorException('User has not have defined password.', Trejjam\Authorization\AuthenticatorException::NOT_DEFINED_PASSWORD);
+				throw new Trejjam\Authorization\User\AuthenticatorException('User has not have defined password.', Trejjam\Authorization\User\AuthenticatorException::NOT_DEFINED_PASSWORD);
 			}
+			else if (!Nette\Security\Passwords::verify($password, $user->password)) {
+				throw new Trejjam\Authorization\User\AuthenticatorException('The password is incorrect.', Trejjam\Authorization\User\AuthenticatorException::INVALID_CREDENTIAL);
 			}
 			elseif (Nette\Security\Passwords::needsRehash($user->password)) {
 				$this->manager->changePassword($user, $password);
@@ -67,7 +70,7 @@ class Authenticator implements Nette\Security\IAuthenticator
 		}
 		else {
 			//this may not happen
-			throw new Trejjam\Authorization\UserManagerException;
+			throw new Trejjam\Authorization\User\AuthenticatorException;
 		}
 	}
 }

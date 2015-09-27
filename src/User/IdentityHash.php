@@ -105,7 +105,7 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 			static::ACTION_DESTROYED,
 		])
 		) {
-			throw new Trejjam\Authorization\UserManagerException("Action '$action' is not enabled.", Trejjam\Authorization\UserManagerException::ACTION_NOT_ENABLED);
+			throw new Trejjam\Authorization\User\IdentityHashException("Action '$action' is not enabled.", Trejjam\Authorization\User\IdentityHashException::ACTION_NOT_ENABLED);
 		}
 
 		$where = [
@@ -144,7 +144,7 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 			static::ACTION_DESTROYED,
 		])
 		) {
-			throw new Trejjam\Authorization\UserManagerException("Action '$action' is not enabled.", Trejjam\Authorization\UserManagerException::ACTION_NOT_ENABLED);
+			throw new Trejjam\Authorization\User\IdentityHashException("Action '$action' is not enabled.", Trejjam\Authorization\User\IdentityHashException::ACTION_NOT_ENABLED);
 		}
 
 		$this->getTable()->where([

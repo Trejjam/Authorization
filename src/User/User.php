@@ -68,8 +68,12 @@ class User extends Nette\Security\User
 					try {
 						$this->login($this->getId(), NULL);
 					}
-					catch (Trejjam\Authorization\UserManagerException $e) {
+					catch (Trejjam\Authorization\User\ManagerException $e) {
 						$this->logout();
+					}
+					catch (Trejjam\Authorization\User\AuthenticatorException $e) {
+						//this may not happen
+						throw $e;
 					}
 
 					break;

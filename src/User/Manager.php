@@ -66,7 +66,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 			])->fetch();
 
 			if (!$id) {
-				throw new Trejjam\Authorization\UserManagerException("User id '$id' not found", Trejjam\Authorization\UserManagerException::ID_NOT_FOUND);
+				throw new Trejjam\Authorization\User\ManagerException("User id '$id' not found", Trejjam\Authorization\User\ManagerException::ID_NOT_FOUND);
 			}
 		}
 
@@ -88,23 +88,23 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	/**
 	 * @param $username
 	 * @return bool
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function isUsernameValid($username) {
 		if (strlen($username) > $this->tables['users']['username']['length']) {
-			throw new Trejjam\Authorization\UserManagerException('The username is too long', Trejjam\Authorization\UserManagerException::LONG_USERNAME);
+			throw new Trejjam\Authorization\User\ManagerException('The username is too long', Trejjam\Authorization\User\ManagerException::LONG_USERNAME);
 		}
 
 		switch ($this->tables['users']['username']['match']) {
 			case 'email':
 				if (!Nette\Utils\Validators::isEmail($username)) {
-					throw new Trejjam\Authorization\UserManagerException('The username is not an email', Trejjam\Authorization\UserManagerException::NOT_VALID_USERNAME);
+					throw new Trejjam\Authorization\User\ManagerException('The username is not an email', Trejjam\Authorization\User\ManagerException::NOT_VALID_USERNAME);
 				}
 
 				break;
 			default:
 				if (!preg_match($this->tables['users']['username']['match'], $username)) {
-					throw new Trejjam\Authorization\UserManagerException('The username is not match regex ' . $this->tables["users"]["username"]["match"], Trejjam\Authorization\UserManagerException::NOT_VALID_USERNAME);
+					throw new Trejjam\Authorization\User\ManagerException('The username is not match regex ' . $this->tables["users"]["username"]["match"], Trejjam\Authorization\User\ManagerException::NOT_VALID_USERNAME);
 				}
 		}
 
@@ -125,12 +125,12 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 				return $user;
 			}
 			else {
-				throw new Trejjam\Authorization\UserManagerException("The user is not exist", Trejjam\Authorization\UserManagerException::NOT_EXIST_USERNAME);
+				throw new Trejjam\Authorization\User\ManagerException("The user is not exist", Trejjam\Authorization\User\ManagerException::NOT_EXIST_USERNAME);
 			}
 		}
 		else {
 			//this may not happen
-			throw new Trejjam\Authorization\UserManagerException;
+			throw new Trejjam\Authorization\User\ManagerException;
 		}
 	}
 
@@ -138,7 +138,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param string|int|\stdClass|Nette\Database\Table\IRow $username
 	 * @param string                                         $type [username|id]
 	 * @return \stdClass
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	protected function getUser($username, $type = "username") {
 		if ($username instanceof Nette\Database\Table\IRow) {
@@ -158,7 +158,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 
 				break;
 			default:
-				throw new Trejjam\Authorization\UserManagerException("Unrecognized type", Trejjam\Authorization\UserManagerException::UNRECOGNIZED_TYPE);
+				throw new Trejjam\Authorization\User\ManagerException("Unrecognized type", Trejjam\Authorization\User\ManagerException::UNRECOGNIZED_TYPE);
 		}
 	}
 
@@ -166,7 +166,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param $username
 	 * @param $password
 	 * @return bool
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function add($username, $password = NULL) {
 		if ($this->isUsernameValid($username)) {
@@ -175,7 +175,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 
 				return FALSE;
 			}
-			catch (Trejjam\Authorization\UserManagerException $e) {
+			catch (Trejjam\Authorization\User\ManagerException $e) {
 				$this->database->table($this->tables["users"]["table"])->insert([
 					$this->tables["users"]["username"]["name"] => $username,
 					$this->tables["users"]["password"]         => is_null($password) ? $password : Nette\Security\Passwords::hash($password),
@@ -186,7 +186,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		}
 		else {
 			//this may not happen
-			throw new Trejjam\Authorization\UserManagerException;
+			throw new Trejjam\Authorization\User\ManagerException;
 		}
 	}
 
@@ -194,7 +194,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param string $username
 	 * @param string $password
 	 * @param string $type [username|id]
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function changePassword($username, $password, $type = "username") {
 		$user = $this->getUser($username, $type);
@@ -207,7 +207,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	/**
 	 * @param string $username
 	 * @param string $type [username|id]
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function setUpdated($username, $type = "username") {
 		$user = $this->getUser($username, $type);
@@ -217,7 +217,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		}
 		else {
 			//this may not happen
-			throw new Trejjam\Authorization\UserManagerException;
+			throw new Trejjam\Authorization\User\ManagerException;
 		}
 	}
 
@@ -225,10 +225,10 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		$user = $this->getUser($user, $type);
 
 		if ($user->status != $this->tables["users"]["status"]["accept"]) {
-			throw new Trejjam\Authorization\UserManagerException('The user is not enable.', Trejjam\Authorization\UserManagerException::NOT_ENABLE);
+			throw new Trejjam\Authorization\User\ManagerException('The user is not enable.', Trejjam\Authorization\User\ManagerException::NOT_ENABLE);
 		}
 		else if ($user->activated != $this->tables["users"]["activated"]["accept"]) {
-			throw new Trejjam\Authorization\UserManagerException('The user is not activated.', Trejjam\Authorization\UserManagerException::NOT_ACTIVATED);
+			throw new Trejjam\Authorization\User\ManagerException('The user is not activated.', Trejjam\Authorization\User\ManagerException::NOT_ACTIVATED);
 		}
 		else {
 			return TRUE;
@@ -239,7 +239,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param string $username
 	 * @param string $activated
 	 * @param string $type [username|id]
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function setActivated($username, $activated = NULL, $type = "username") {
 		if (is_null($activated)) {
@@ -247,7 +247,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		}
 
 		if (!in_array($activated, $this->getActivatedOptions())) {
-			throw new Trejjam\Authorization\UserManagerException('Activated has unknown value.', Trejjam\Authorization\UserManagerException::UNKNOWN_VALUE);
+			throw new Trejjam\Authorization\User\ManagerException('Activated has unknown value.', Trejjam\Authorization\User\ManagerException::UNKNOWN_VALUE);
 		}
 
 		$user = $this->getUser($username, $type);
@@ -260,7 +260,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param        $username
 	 * @param string $type [username|id]
 	 * @return string
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function getActivated($username, $type = 'username') {
 		$user = $this->getUser($username, $type);
@@ -279,11 +279,11 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param string $username
 	 * @param string $status
 	 * @param string $type [username|id]
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function setStatus($username, $status, $type = "username") {
 		if (!in_array($status, $this->getStatusOptions())) {
-			throw new Trejjam\Authorization\UserManagerException('Status has unknown value.', Trejjam\Authorization\UserManagerException::UNKNOWN_VALUE);
+			throw new Trejjam\Authorization\User\ManagerException('Status has unknown value.', Trejjam\Authorization\User\ManagerException::UNKNOWN_VALUE);
 		}
 
 		$user = $this->getUser($username, $type);
@@ -297,7 +297,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param        $username
 	 * @param string $type [username|id]
 	 * @return string
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function getStatus($username, $type = 'username') {
 		$user = $this->getUser($username, $type);
@@ -316,7 +316,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param string $username
 	 * @param string $type [auto|activeRow|username|id]
 	 * @return \stdClass
-	 * @throws Trejjam\Authorization\UserManagerException
+	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function getUserInfo($username, $type = "auto") {
 		if ($type == "auto") {
@@ -337,7 +337,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 
 				break;
 			default:
-				throw new Trejjam\Authorization\UserManagerException("Unrecognized type", Trejjam\Authorization\UserManagerException::UNRECOGNIZED_TYPE);
+				throw new Trejjam\Authorization\User\ManagerException("Unrecognized type", Trejjam\Authorization\User\ManagerException::UNRECOGNIZED_TYPE);
 		}
 
 		$baseUser = $user;
