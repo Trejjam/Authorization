@@ -193,6 +193,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @param string $username
 	 * @param string $password
 	 * @param string $type [username|id]
+	 * @return bool
 	 * @throws Trejjam\Authorization\User\ManagerException
 	 */
 	public function changePassword($username, $password, $type = 'username') {
@@ -201,6 +202,8 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		$user->{static::ROW}->update([
 			$this->getTableCell('password') => Nette\Security\Passwords::hash($password),
 		]);
+
+		return true;
 	}
 
 	/**
