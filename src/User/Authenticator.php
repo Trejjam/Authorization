@@ -47,8 +47,9 @@ class Authenticator implements Nette\Security\IAuthenticator
 		else {
 			$user = $this->manager->getUserByUsername($username);
 
-			if (!Nette\Security\Passwords::verify($password, $user->password)) {
-				throw new Trejjam\Authorization\UserManagerException('The password is incorrect.', Trejjam\Authorization\UserManagerException::INVALID_CREDENTIAL);
+			if (is_null($user->password)) {
+				throw new Trejjam\Authorization\AuthenticatorException('User has not have defined password.', Trejjam\Authorization\AuthenticatorException::NOT_DEFINED_PASSWORD);
+			}
 			}
 			elseif (Nette\Security\Passwords::needsRehash($user->password)) {
 				$this->manager->changePassword($user, $password);

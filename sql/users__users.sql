@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `users__users` (
 	`username`  VARCHAR(60)
 				COLLATE utf8mb4_unicode_ci NOT NULL,
 	`password`  TEXT
-				COLLATE utf8mb4_unicode_ci NOT NULL,
+				COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 )
 	ENGINE = InnoDB

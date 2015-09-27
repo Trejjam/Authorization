@@ -178,7 +178,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 			catch (Trejjam\Authorization\UserManagerException $e) {
 				$this->database->table($this->tables["users"]["table"])->insert([
 					$this->tables["users"]["username"]["name"] => $username,
-					$this->tables["users"]["password"]         => is_null($password) ? '' : Nette\Security\Passwords::hash($password),
+					$this->tables["users"]["password"]         => is_null($password) ? $password : Nette\Security\Passwords::hash($password),
 				]);
 
 				return TRUE;

@@ -47,6 +47,13 @@ class RoleException extends LogicException
 		ALREADY_IN_ROLE = 8;
 }
 
+class AuthenticatorException extends Nette\Security\AuthenticationException implements ILogicException
+{
+	const
+			INVALID_CREDENTIAL = 1,
+			NOT_DEFINED_PASSWORD = 2;
+}
+
 class ResourceException extends LogicException
 {
 	const
