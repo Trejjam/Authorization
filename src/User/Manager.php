@@ -59,7 +59,10 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @return \stdClass
 	 */
 	public function getItem($id) {
-		if (!$id instanceof Nette\Database\Table\IRow) {
+		if (isset($id->{static::ROW})) {
+			$id = $id->{static::ROW};
+		}
+		else if (!$id instanceof Nette\Database\Table\IRow) {
 			$id = $this->getTable()->where([
 				$this->getTableCell('id') => $id,
 			])->fetch();
