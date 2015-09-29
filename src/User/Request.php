@@ -42,17 +42,20 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @return \stdClass
 	 */
 	public function getItem($id) {
-		if (!$id instanceof Nette\Database\Table\IRow) {
+		if (isset($id->{static::ROW})) {
+			$id = $id->{static::ROW};
+		}
+		else if (!$id instanceof Nette\Database\Table\IRow) {
 			$id = $this->getTable()->get($id);
 		}
 
 		$out = (object)[
-				static::ROW => $id,
-				'id'        => $id->{$this->tables['userRequest']['id']},
-				'userId'    => $id->{$this->tables['userRequest']['user_id']},
-				'hash'      => $id->{$this->tables['userRequest']['hash']},
-				'type'      => $id->{$this->tables['userRequest']['type']},
-				'used'      => $id->{$this->tables['userRequest']['used']} == $this->tables['userRequest']['positive'],
+			static::ROW => $id,
+			'id'        => $id->{$this->tables['userRequest']['id']},
+			'userId'    => $id->{$this->tables['userRequest']['user_id']},
+			'hash'      => $id->{$this->tables['userRequest']['hash']},
+			'type'      => $id->{$this->tables['userRequest']['type']},
+			'used'      => $id->{$this->tables['userRequest']['used']} == $this->tables['userRequest']['positive'],
 		];
 
 		return $out;
@@ -76,7 +79,7 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 			$this->tables['userRequest']['userId']          => isset($userId->{static::ROW}) ? $userId->id : $userId,
 			$this->tables['userRequest']['hash']['name']    => Nette\Security\Passwords::hash($hash),
 			$this->tables['userRequest']['type']['name']    => $type,
-			$this->tables['userRequest']['timeout']['name'] => new Nette\Database\SqlLiteral('NOW() + INTERVAL ' . $timeout),
+			$this->tables['userRequest']['timeout']['name'] => $timeout === FALSE ? NULL : new Nette\Database\SqlLiteral('NOW() + INTERVAL ' . $timeout),
 		]);
 
 		return [$insertion->id, $hash];
@@ -102,13 +105,13 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 				throw new Trejjam\Authorization\User\RequestException('Hash was used', Trejjam\Authorization\User\RequestException::USED_HASH);
 			}
 
-			if ($row->{$this->tables['userRequest']['timeout']['name']} < $this->getSqlTime()) {
+			if (!is_null($row->{$this->tables['userRequest']['timeout']['name']}) && $row->{$this->tables['userRequest']['timeout']['name']} < $this->getSqlTime()) {
 				throw new Trejjam\Authorization\User\RequestException('Hash timeout', Trejjam\Authorization\User\RequestException::HASH_TIMEOUT);
 			}
 
 			if ($invalidateHash) {
 				$row->update([
-					$this->tables['userRequest']['used']['name'] => $this->tables['userRequest']['used']['positive']
+					$this->tables['userRequest']['used']['name'] => $this->tables['userRequest']['used']['positive'],
 				]);
 			}
 

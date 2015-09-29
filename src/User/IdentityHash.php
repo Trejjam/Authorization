@@ -30,7 +30,6 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 
 	/**
 	 * @param Nette\Database\Context $database
-	 * @param Acl                    $acl
 	 */
 	public function __construct(Nette\Database\Context $database) {
 		$this->database = $database;
@@ -55,7 +54,10 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @return \stdClass
 	 */
 	public function getItem($id) {
-		if (!$id instanceof Nette\Database\Table\IRow) {
+		if (isset($id->{static::ROW})) {
+			$id = $id->{static::ROW};
+		}
+		else if (!$id instanceof Nette\Database\Table\IRow) {
 			$id = $this->getTable()->get($id);
 		}
 
