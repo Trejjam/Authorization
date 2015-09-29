@@ -73,7 +73,7 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 		}
 
 		$insertion = $this->getTable()->insert([
-			$this->tables['userRequest']['userId']          => $userId,
+			$this->tables['userRequest']['userId']          => isset($userId->{static::ROW}) ? $userId->id : $userId,
 			$this->tables['userRequest']['hash']['name']    => Nette\Security\Passwords::hash($hash),
 			$this->tables['userRequest']['type']['name']    => $type,
 			$this->tables['userRequest']['timeout']['name'] => new Nette\Database\SqlLiteral('NOW() + INTERVAL ' . $timeout),
@@ -90,7 +90,7 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 	 */
 	public function getType($userId, $requestId, $hash, $invalidateHash = TRUE) {
 		if ($row = $this->getTable()->where([
-			$this->tables['userRequest']['userId'] => $userId,
+			$this->tables['userRequest']['userId'] => isset($userId->{static::ROW}) ? $userId->id : $userId,
 			$this->tables['userRequest']['id']     => $requestId,
 		])->fetch()
 		) {
