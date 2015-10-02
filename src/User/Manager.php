@@ -19,8 +19,8 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	protected $tables;
 
 	/**
-	 * @param Nette\Database\Context        $database
-	 * @param IdentityHash                  $identityHash
+	 * @param Nette\Database\Context $database
+	 * @param IdentityHash           $identityHash
 	 */
 	public function __construct(Nette\Database\Context $database, IdentityHash $identityHash) {
 		$this->database = $database;
@@ -206,7 +206,17 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 			$this->getTableCell('password') => Nette\Security\Passwords::hash($password),
 		]);
 
-		return true;
+		return TRUE;
+	}
+
+	public function changeUsername($user, $username, $type = 'username') {
+		$user = $this->getUser($user, $type);
+
+		$user->{static::ROW}->update([
+			$this->getTableCell('username') => $username,
+		]);
+
+		return TRUE;
 	}
 
 	/**
