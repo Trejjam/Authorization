@@ -18,6 +18,8 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 
 	protected $tables;
 
+	protected $userCache=[];
+
 	/**
 	 * @param Nette\Database\Context $database
 	 * @param IdentityHash           $identityHash
@@ -63,6 +65,10 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 			$id = $id->{static::ROW};
 		}
 		else if (!$id instanceof Nette\Database\Table\IRow) {
+			if (isset($this->userCache[$id])) {
+				return $this->userCache[$id];
+			}
+
 			$id = $this->getTable()->where([
 				$this->getTableCell('id') => $id,
 			])->fetch();
@@ -84,7 +90,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 			$out->$k = $id->{$v};
 		}
 
-		return $out;
+		return $this->userCache[$out->id] = $out;
 	}
 
 	/**
@@ -216,6 +222,10 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 			$this->getTableCell('username') => $username,
 		]);
 
+		if (isset($this->userCache[$user->id])) {
+			unset($this->userCache[$user->id]);
+		}
+
 		return TRUE;
 	}
 
@@ -270,6 +280,10 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		$user->{static::ROW}->update([
 			$this->getTableCell('activated') => $activated,
 		]);
+
+		if (isset($this->userCache[$user->id])) {
+			unset($this->userCache[$user->id]);
+		}
 	}
 	/**
 	 * @param        $username
@@ -306,6 +320,10 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		$user->{static::ROW}->update([
 			$this->getTableCell('status') => $status,
 		]);
+
+		if (isset($this->userCache[$user->id])) {
+			unset($this->userCache[$user->id]);
+		}
 	}
 
 	/**
