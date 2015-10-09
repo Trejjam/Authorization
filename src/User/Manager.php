@@ -62,24 +62,27 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 */
 	public function getItem($id) {
 		if (isset($id->{static::ROW})) {
-			$id = $id->{static::ROW};
+			$row = $id->{static::ROW};
 		}
-		else if (!$id instanceof Nette\Database\Table\IRow) {
+		else if ($id instanceof Nette\Database\Table\IRow) {
+			$row = $id;
+		}
+		else {
 			if (isset($this->userCache[$id])) {
 				return $this->userCache[$id];
 			}
 
-			$id = $this->getTable()->where([
+			$row = $this->getTable()->where([
 				$this->getTableCell('id') => $id,
 			])->fetch();
 
-			if (!$id) {
+			if (!$row) {
 				throw new Trejjam\Authorization\User\ManagerException("User id '$id' not found", Trejjam\Authorization\User\ManagerException::ID_NOT_FOUND);
 			}
 		}
 
 		$out = (object)[
-			static::ROW => $id,
+			static::ROW => $row,
 		];
 
 		foreach ($this->tables['users']['items'] as $k => $v) {
@@ -87,7 +90,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 				$k = $v;
 			}
 
-			$out->$k = $id->{$v};
+			$out->$k = $row->{$v};
 		}
 
 		return $this->userCache[$out->id] = $out;
@@ -373,7 +376,7 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 				throw new Trejjam\Authorization\User\ManagerException('Unrecognized type', Trejjam\Authorization\User\ManagerException::UNRECOGNIZED_TYPE);
 		}
 
-		$baseUser = $user;
+		$baseUser = clone $user;
 		unset($baseUser->{Trejjam\Utils\Helpers\Database\ABaseList::ROW});
 		unset($baseUser->password);
 
