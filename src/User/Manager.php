@@ -409,7 +409,6 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 		return $out;
 	}
 
-
 	/**
 	 * @param array $sort
 	 * @param array $filter
