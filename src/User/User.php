@@ -57,7 +57,7 @@ class User extends Nette\Security\User
 		if ($this->storage->isAuthenticated()) {
 			$identity = $this->storage->getIdentity();
 
-			$action = $this->identityHash->getHashAction($identity->hash);
+			$action = $this->identityHash->getHashAction(is_null($identity) ? $identity : $identity->hash);
 
 			if (is_null($action)) {
 				parent::logout();

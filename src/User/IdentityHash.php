@@ -127,6 +127,10 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 	}
 
 	public function getHashAction($hash) {
+		if (is_null($hash)) {
+			return NULL;
+		}
+
 		$hashes = $this->getList(NULL, [
 			Trejjam\Utils\Helpers\Database\ABaseList::STRICT => [
 				$this->tables['identityHash']['hash'] => $hash,
@@ -135,7 +139,7 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 
 		$action = reset($hashes);
 
-		return $action->action;
+		return $action ? $action->action : NULL;
 	}
 
 	public function setHashAction($hash, $action) {
