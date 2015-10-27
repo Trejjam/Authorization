@@ -1,6 +1,8 @@
 Authorization
 =============
 
+[![Latest stable](https://img.shields.io/packagist/v/trejjam/authorization.svg)](https://packagist.org/packages/trejjam/authorization)
+
 Library for 
 <ul>
 <li>authorization</li>
@@ -15,7 +17,7 @@ Installation
 The best way to install Trejjam/Authorization is using  [Composer](http://getcomposer.org/):
 
 ```sh
-$ composer require trejjam/authorization:v0.10
+$ composer require trejjam/authorization
 ```
 
 Configuration
