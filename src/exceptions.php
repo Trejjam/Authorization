@@ -103,10 +103,11 @@ class_alias('Trejjam\Authorization\User\AuthenticatorException', 'Trejjam\Author
 class RequestException extends LogicException
 {
 	const
-		PERMISSION_DENIED = 1,
-		CORRUPTED_HASH = 2,
-		USED_HASH = 4,
-		HASH_TIMEOUT = 8;
+		PERMISSION_DENIED = 0b00001,
+		CORRUPTED_HASH = 0b00010,
+		USED_HASH = 0b00100,
+		HASH_TIMEOUT = 0b01000,
+		INVALID_INPUT = 0b10000;
 }
 
 class_alias('Trejjam\Authorization\User\RequestException', 'Trejjam\Authorization\UserRequestException');

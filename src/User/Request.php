@@ -92,6 +92,14 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @return bool|string
 	 */
 	public function getType($userId, $requestId, $hash, $invalidateHash = TRUE) {
+		if (
+			!Nette\Utils\Validators::isNumericInt($userId)
+			|| !Nette\Utils\Validators::isNumericInt($requestId)
+			|| empty($hash)
+		) {
+			throw new Trejjam\Authorization\User\RequestException('Invalid input parameters', Trejjam\Authorization\User\RequestException::INVALID_INPUT);
+		}
+
 		if ($row = $this->getTable()->where([
 			$this->tables['userRequest']['userId'] => isset($userId->{static::ROW}) ? $userId->id : $userId,
 			$this->tables['userRequest']['id']     => $requestId,
