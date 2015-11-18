@@ -93,7 +93,7 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 	 */
 	public function getType($userId, $requestId, $hash, $invalidateHash = TRUE) {
 		if (
-			!Nette\Utils\Validators::isNumericInt($userId)
+			(!isset($userId->{static::ROW}) && !Nette\Utils\Validators::isNumericInt($userId))
 			|| !Nette\Utils\Validators::isNumericInt($requestId)
 			|| empty($hash)
 		) {
