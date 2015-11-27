@@ -42,20 +42,15 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @return \stdClass
 	 */
 	public function getItem($id) {
-		if (isset($id->{static::ROW})) {
-			$id = $id->{static::ROW};
-		}
-		else if (!$id instanceof Nette\Database\Table\IRow) {
-			$id = $this->getTable()->get($id);
-		}
+		$row = $this->getRow($id);
 
 		$out = (object)[
-			static::ROW => $id,
-			'id'        => $id->{$this->tables['userRequest']['id']},
-			'userId'    => $id->{$this->tables['userRequest']['user_id']},
-			'hash'      => $id->{$this->tables['userRequest']['hash']},
-			'type'      => $id->{$this->tables['userRequest']['type']},
-			'used'      => $id->{$this->tables['userRequest']['used']} == $this->tables['userRequest']['positive'],
+			static::ROW => $row,
+			'id'        => $row->{$this->tables['userRequest']['id']},
+			'userId'    => $row->{$this->tables['userRequest']['user_id']},
+			'hash'      => $row->{$this->tables['userRequest']['hash']},
+			'type'      => $row->{$this->tables['userRequest']['type']},
+			'used'      => $row->{$this->tables['userRequest']['used']} == $this->tables['userRequest']['positive'],
 		];
 
 		return $out;
@@ -129,7 +124,7 @@ class Request extends Trejjam\Utils\Helpers\Database\ABaseList
 		throw new Trejjam\Authorization\User\RequestException("Permission denied to requestId '$requestId' for user '$userId'", Trejjam\Authorization\User\RequestException::PERMISSION_DENIED);
 	}
 
-	private function getSqlTime() {
+	protected function getSqlTime() {
 		if (isset($this->sqlTime)) {
 			return $this->sqlTime;
 		}
