@@ -50,7 +50,6 @@ class Storage extends Nette\Http\UserStorage
 	 */
 	public function setIdentity(Nette\Security\IIdentity $identity = NULL) {
 		if (!is_null($identity)) {
-
 			$identity->browser = $this->browser->getName();
 			$identity->browserVersion = $this->browser->getVersion();
 

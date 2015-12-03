@@ -99,7 +99,7 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 		return $hash;
 	}
 
-	public function setAction($user, $action) {
+	public function setAction($user, $action, $identityHash = NULL) {
 		if (!in_array($action, [
 			static::ACTION_NONE,
 			static::ACTION_RELOAD,
@@ -113,6 +113,9 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 		$where = [
 			$this->tables['identityHash']['userId'] => Nette\Utils\Validators::isNumericInt($user) ? $user : $user->id,
 		];
+		if (!is_null($identityHash)) {
+			$where[$this->tables['identityHash']['hash']] = $identityHash;
+		}
 
 		switch ($action) {
 			case static::ACTION_RELOAD:
