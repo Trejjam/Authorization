@@ -109,9 +109,9 @@ class AuthorizationExtension extends Trejjam\BaseExtension\DI\BaseExtension
 		],
 		'reloadChangedUser' => TRUE, //for example admin edit user role, then users role will be changed (in user session)
 		'cache'             => [
-			"use"     => TRUE,
-			"name"    => "authorization",
-			"timeout" => "10 minutes"
+			'use'     => TRUE,
+			'name'    => 'authorization',
+			'timeout' => '10 minutes'
 		],
 	];
 
