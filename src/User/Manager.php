@@ -15,6 +15,10 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 	 * @var Nette\Database\Context
 	 */
 	protected $database;
+	/**
+	 * @var IdentityHash
+	 */
+	protected $identityHash;
 
 	protected $tables;
 
@@ -404,6 +408,17 @@ class Manager extends Trejjam\Utils\Helpers\Database\ABaseList
 			IdentityHash::ACTION_RELOAD,
 		]) as $v) {
 			$out[$v->hash] = $v->ip;
+		}
+
+		return $out;
+	}
+
+	public function getSimplified(array $sort = NULL, array $filter = NULL, $limit = NULL, $offset = NULL)
+	{
+		$out = [];
+
+		foreach ($this->getList($sort, $filter, $limit, $offset) as $k => $v) {
+			$out[$k] = $v->username;
 		}
 
 		return $out;
