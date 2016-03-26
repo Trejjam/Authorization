@@ -74,7 +74,7 @@ class IdentityHash extends Trejjam\Utils\Helpers\Database\ABaseList
 	}
 
 	public function getUserHashes($user, array $actions = []) {
-		return $this->getRelatedList($user, $this->tables['identityHash']['userId'], NULL, [
+		return $this->getRelatedList($user, $this->tables['identityHash']['userId'], ['id'], [
 			static::STRICT => [
 				$this->tables['identityHash']['action'] => $actions,
 			]
