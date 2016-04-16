@@ -12,6 +12,13 @@ namespace Trejjam\Authorization\User;
 use Nette,
 	Trejjam;
 
+/**
+ * Class User
+ *
+ * @package Trejjam\Authorization\User
+ *
+ * @method Nette\Security\IIdentity|Identity|NULL getIdentity()
+ */
 class User extends Nette\Security\User
 {
 	/**
