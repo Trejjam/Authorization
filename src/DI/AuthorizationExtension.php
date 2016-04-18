@@ -139,7 +139,7 @@ class AuthorizationExtension extends Trejjam\BaseExtension\DI\BaseExtension
 			foreach ($command as $k => $v) {
 				$builder->addDefinition($this->prefix($k))
 						->setClass('Trejjam\Authorization\Cli\\' . $v)
-						->addTag(\Kdyby\Console\DI\ConsoleExtension::COMMAND_TAG);
+						->addTag(\Kdyby\Console\DI\ConsoleExtension::TAG_COMMAND);
 			}
 		}
 	}

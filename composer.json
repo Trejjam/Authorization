@@ -35,7 +35,7 @@
 		"nette/tester": "@dev",
 		"nette/bootstrap": "^2.3",
 		"nette/robot-loader": "^2.3",
-		"kdyby/console": "^2.4"
+		"kdyby/console": "^2.5"
 	},
 	"suggest": {
 		"kdyby/console": "to use CLI configurator"
